@@ -1,0 +1,53 @@
+
+ WAR files and URLs in Tomcat deployment: request mapping ('dispatching')
+ 
+ # How does Tomcat map client requests to the appropriate 'resource' within a web app?
+        
+                 +--------------------+
+    request----->| request dispatcher |----->requested resource
+                 +--------------------+
+
+   ## Bascally a two-step operation:
+
+      -- First, find the appropriate WAR file.
+
+      -- Second, find the resource (e.g., HTML page, Jave code) within the WAR file.
+
+      -- If the requested WAR file doesn't exist, or the resource within it, we get the
+         familiar "404 Not Found" response from the web server.
+
+--------------------------------------------------------------------------------------------------------
+
+ # The standard way to deploy a web app in Tomcat is to copy a WAR file (JAR file with a .war extension)
+   to the TOMCAT_HOME/webapps tree (i.e., this directory or some subdirectory)
+
+   ## The WAR file name is arbitrary.
+
+   ## In this example, the deployed WAR file is named 'preds.war'.
+
+   ## Contents of the deployed 'preds.war' file:
+
+       ajax.xhtml                                 ## the identifier is 'ajax.jsf', a proxy for 'ajax.xhtml'
+       WEB-INF/web.xml                            ## standard 'deployment descriptor' (optional)
+       WEB-INF/faces-config.xml                   ## JSF deployment descriptor
+       WEB-INF/classes/beans/Controller.class     ## backend JavaBean
+       WEB-INF/classes/beans/Organization.class   ## ditto
+       WEB-INF/classes/beans/Prediction.class     ## ditto
+       WEB-INF/lib/javax.faces.jar                ## JSF implementation library
+
+ # The client's URL includes the WAR file's name as the _first_ name in the URI-part of the URL.
+
+   Example with 'preds.war' as the name of the deployed WAR file:
+
+
+   'scheme'    port number  WAR file name  JSF script in the WAR file
+        \               \      /           /
+       http://localhost:8080/preds/ajax.jsf   ## URI starts with the / after the port number
+              \_______/     \_____________/   ## URI = Uniform Resource Identifier: a name
+                  /                \
+       server's address       resource URI (Uniform Resource Identifier), aka 'path'
+
+    ## In this example, /preds/ajax.jsf is the URI ('path to resource') -- what's being requested.
+   
+    ## The URI begins with '/preds' == a slash and then the WAR file's name _without_ the '.war' extension
+                 

@@ -1,0 +1,112 @@
+
+ Further verification of the downloaded Tomcat
+ 
+ # For a production environment, this verification would be standard practice; but it's a good idea
+   for a learning environment as well.
+
+   ## The standard command-line utility for checking digital signatures is called 'gpg' (GNU Privacy Guard).
+      ### 'gpg' is a suite of utilities, including a utility to digitally sign something.
+
+   ## On Windows, 'certutil' can be used for the same purpose, and on a Mac 'codesign' is the built-in 
+      equivalent.
+
+      ## However, 'gpg' has become an at least informal standard, and versions are available for
+         Windows and Macs:
+
+                  https://www.gnupg.org/download/
+
+         For simplicity, this handout sticks mainly with the 'gpg' utility.
+
+ # Verifying Tomcat's digital signature, as all of its downloadable archives are digitally signed.
+
+   ## Key Pair:
+
+      -- private key, kept secret by the owner
+      -- public key, distributed to anyone who wants a copy
+
+   ## The owner of the private key uses it to digitally sign something (e.g., a ZIP file).
+   ## The verifier of the signature uses the public key to verify the digital signature.
+
+   ## Here's a depiction of what we're doing in verifying Tomcat's digital signature:
+ 
+                    Unix-like systems have 'gpg' utility to do this, Windows has 'certUtil'
+                                                    \
+                                                +----------+
+         digital signature--------------------->|          |
+                                                | verifier |------>yes or no
+         public key from signer's key pair----->|          |
+                                                +----------+
+
+       ### Here's the signature, from the 'pgp' entry that precedes the 'md5' and 'sha1' 
+           entries on the download page. I've placeed this digital signature in the file
+           'ds.asc', but any file name would do:
+
+          -----BEGIN PGP SIGNATURE-----
+          Version: GnuPG v2
+
+          iQIcBAABCAAGBQJW7GYPAAoJEBDAHFovYFnnwQUP/iltVWLgfqLJkLgosuF9gmyl
+          TYHiRuXKncA9upZuO4WKRbWYyUE50A81CfspyaDQmEC5v02v+KjcAOVdXh5aXWQw
+          HxVCp9GsfiV/ddfC0fu2NKD+0gmkhBVUpIK6+FWmOcR0spmZxjMnEAE3XPvWtniZ
+          KDdsPmiiGcbMKkcUNWKb/8EHh7Dw0W2JfAsUFSS8Axl77/VDmfeyD7lMs6Ydxxuo
+          fPEdojEtYtbpfrf6ZjhLvEMoCvwlpTcWxHMZqo5hJsYIBuwQadvbcmy1X8PiqNIi
+          v9JMfK53sj11GM6kJn0qjmUpuNt5zIl05P83IaFrm2KkhEhUqI9l55VHldH+z8PA
+          pSFHP8W5DoVEyTxK0op5JyQ7tGFFJ6k031I327Sb3nsKocz5nEiZxo/nSIXuxe8R
+          0ROFRa8P+0f6LjYqAIg5W8nx0jD7Nrj5hdijY9WCCy/yiAvyySuAxwen4kwkotBx
+          +460ctyEb3/7RFqhksGQZsyzCapPA4smgsB9yEEgqQW9lce6z81cVJsXguz8XbV2
+          lXsGLcbgcBWbqx8abV+8OGhoSLxur7iLzJaWBL3q1oWrZpnKydW46NJDrKfId6nP
+          7SFPDH+gJ0FfQBIGt+5NfoF8TeOdYX5MepdpuM/VpbaR+JKSLspOjF3lauqGCqrR
+          NCBTVZApJDCH8LIXoZVh
+          =hUOK
+          -----END PGP SIGNATURE-----
+
+       ### We now need a series of commands to get Tomcat's public key so that we can verify
+           this signature. The commands are given below with comments starting '##'.
+
+           ## Try to verify, even though we lack the public code to do so.
+           % gpg --verify ds.asc apache-tomcat-8.0.33.zip
+               gpg: Signature made Fri 18 Mar 2016 03:33:19 PM CDT using RSA key ID 2F6059E7
+               gpg: Can't check signature: public key not found
+
+           ## Get Tomcat public key from reliable source (e.g., MIT): use 'key ID' above
+           % gpg --keyserver pgpkeys.mit.edu --recv-key 2F6059E7
+               gpg: requesting key 2F6059E7 from hkp server pgpkeys.mit.edu
+               gpg: key 2F6059E7: public key "Mark E D Thomas <markt@apache.org>" imported
+               gpg: no ultimately trusted keys found
+               gpg: Total number processed: 1 
+               gpg:               imported: 1  (RSA: 1)
+
+           ## Now try the verification again.
+           % gpg --verify ds.asc apache-tomcat-8.0.33.zip
+               gpg: Signature made Fri 18 Mar 2016 03:33:19 PM CDT using RSA key ID 2F6059E7
+               gpg: Good signature from "Mark E D Thomas <markt@apache.org>"
+               gpg: WARNING: This key is not certified with a trusted signature!
+               gpg:          There is no indication that the signature belongs to the owner.
+               Primary key fingerprint: A9C5 DF4D 22E9 9998 D987  5A51 10C0 1C5A 2F60 59E7
+
+           ## Get some confirmation on the fingerprint. Tomcat lists all of the developer keys
+           ## in the file (available from the download page) in the file KEYS.
+           ## The critical question: How much trust do you need to accept the signature?
+           % gpg --fingerprint 2F6059E7
+               pub   4096R/2F6059E7 2009-09-18
+                     Key fingerprint = A9C5 DF4D 22E9 9998 D987  5A51 10C0 1C5A 2F60 59E7
+               uid                  Mark E D Thomas <markt@apache.org>
+               sub   4096R/5E763BEC 2009-09-18
+
+           ## Get the signer data from the KEYS file (which I've saved locally as KEYS.txt):
+           % gpg < KEYS.txt
+               pub  1024D/F22C4FED 2001-07-02 Andy Armstrong <andy@tagish.com>
+               sub  2048g/02908623 2001-07-02
+               pub  1024D/86867BA6 2001-11-22 Jean-Frederic Clere (jfclere) <JFrederic.Clere@fujitsu-siemens.com>
+               sub  1024g/4DC1E793 2001-11-22
+               ...
+               pub  1024D/288584E7 2008-07-02 Rémy Maucherat <remm@apache.org>
+               sub  4096g/4B6FAEFB 2008-07-02
+               pub  1024D/0D811BBE 2006-11-14 Yoav Shapira <yoavs@computer.org>
+               sub  2048g/286BACF1 2006-11-14
+               pub  4096R/731FABEE 2011-05-27 Tim Whittington (CODE SIGNING KEY) <timw@apache.org>
+               sub  4096R/461B342D 2011-05-27
+               pub  3072D/0D498E23 2013-01-14 Mladen Turk (Default signing key) <mturk@apache.org>
+               sub  4096g/DC3D1B18 2013-01-14
+
+
+           

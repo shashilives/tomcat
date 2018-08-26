@@ -1,0 +1,47 @@
+
+-- Tomcat's directory structure
+
+ # Tomcat can be installed (e.g., by unzipping a downloaded ZIP file) anywhere on the local system.
+
+   ## For reference, TOMCAT_HOME is the top-level install directory.
+   
+      ### You could define an environment variable with this name, but it's not required.
+
+ # Here's the directory structure for TOMCAT_HOME:
+
+                              TOMCAT_HOME     ## contains LICENSE, NOTICE, RELEASE-NOTES, RUNNING.txt
+                                    |
+   +----------+----------+----------+----------+----------+---------+
+   |          |          |          |          |          |         |
+  bin        conf       lib        logs       temp       webapps   work
+  
+   *## bin:     scripts to start/stop Tomcat, etc.
+    ## conf:    configuration files (XML files)
+    ## lib:     Tomcat and 3rd-party libraries (JAR files)
+    ## logs:    log files (many over time...)
+    ## temp:    temporary files created using the Java File API
+   *## webapps: deployed web apps (web sites, web services, web sockets,...)
+    ## work:    Tomcat-compiled JSP scripts and other assets
+
+   A star * marks the two subdirectories we care about most at the start.
+
+  # More about TOMCAT_HOME/webapps
+
+    ## It's the 'virtual base directory' for a deployed web app, e.g., 'preds.war'.
+
+       ### The 'virtual' underscores that TOMCAT_HOME/webapps is _not_ part of the URI:
+
+              http://localhost:8080/preds    ## no sign of TOMCAT_HOME/webapps
+
+       ### TOMCAT_HOME/webapps can have arbitrarily many subdirectories to any level.
+
+           Example: If 'preds.war' were deployed to TOMCAT_HOME/webapps/examples, then
+	            the URL would be:
+          
+              http://localhost:8080/examples/preds
+
+           -- To keep the URI part as simple as possible, I prefer to put all of my web apps
+	      in TOMCAT_HOME/webapps rather than in a subdirectory thereof.
+	      
+
+

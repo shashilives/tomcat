@@ -1,0 +1,33 @@
+
+ Exercise: Install Tomcat on your local system
+
+ # Quick review of the required steps, and some suggestions:
+
+   1. Define JAVA_HOME as an environment variable for the local system so that it 
+      points to the install directory of the JDK.
+
+      -- If you've only the JRE, not the full JDK, then define JRE_HOME instead.
+
+         ## The JDK is recommended for some later examples, which require code to be compiled.
+
+         ## There's excellent on-line help for setting environment variables on different
+	    systems. Below is a search string, where <Version> represents a particular
+            Windows version (e.g., 7, 8, 10) or Mac OS X version (e.g., El Capitan).
+            For Linux systems, <Version> would be one of Ubuntu, Fedora, etc.
+
+            "set environment variable in <Version>"  ### Search on this string for quick tips
+
+   2. Download core Tomcat from http://tomcat.apache.org in either archive or installer form.
+
+      -- If you're on Windows and want to run Tomcat as a system service, the Windows
+         installer is a good idea.
+
+   3. Verify Tomcat in a way that's appropriate for your needs.
+
+      -- Verify the MD5 and SHA1 digests that Apache provides for all downloads.
+
+      -- Verify the digial signature included in Apache download files.
+
+   4. Do a quick start/stop of the installed Tomcat to make sure it's running.
+      Using a browser or 'curl' pointed to http://localhost:8080 to verify that the start worked.
+

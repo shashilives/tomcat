@@ -1,0 +1,45 @@
+
+ -- Deployment basics with Tomcat defaults
+
+ # Tomcat supports two modes of deployment: 
+
+   -- packed: the entire web app is packaged in a WAR file
+
+   -- unpacked: individual pieces in a directory structure that matches
+                what you'd get if you were to 'unwar' the corresponding WAR file
+
+      ## If the WAR is 'preds.war', then the 'unpacked' version is available with
+         the standard 'jar' utility that ships with the JDK:
+
+         % jar xvf preds.war   ## unpack the contents, leave the WAR file as is
+
+   ## Only 'packed' deployment is required under the Java servlet spec, but Tomcat supports
+      either approach to deployment.
+
+ # Packed deployment is cleaner, safer, easier -- no compelling reason not to use it.
+
+   ## Standard packed deployment, in general, should work as is for other web containers such as Jetty.
+
+   ## Packed deployment makes undeployment and redeployment easy:
+
+      -- To undeploy, remove the WAR file from TOMCAT_HOME/webapps: Tomcat then removes the 'unpacked' directory.
+
+      -- To redeploy, overwrite the current copy of the WAR file with a new one: Tomcat again 'unpacks'.
+
+   ## Since a WAR file has its own hierarchical file structure, the rules for 'packed' and 'unpacked' are the same
+      with respect to what goes where in the WAR file.
+
+ # How to deploy?
+
+   ## Ant, Maven, and even other scripts are in wide use.
+
+      ### The Apache Tomcat download site provides one such script: more on this later.
+
+      ### IDEs such as Eclipse, NetBeans, and IntelliJ provides scripts under the hood to do
+          the work.
+
+      ### A close look at such a script is coming...
+
+
+
+

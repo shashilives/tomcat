@@ -1,0 +1,52 @@
+
+ -- Wrapup of concurrency issues for Tomcat
+
+ # The issue:
+
+   -- Tomcat supports 'concurrent request handling' with a mix of multi-threading and non-blocking I/O.
+
+      ## Each request to Tomcat is dispatched to a thread (from a pool) for handling.
+
+      ## Tomcat has thread pools per connector: a thread pool for HTTP, another for HTTPS,...
+
+      ## Pool size is configurable.
+
+   -- Threads within the same process thereby have access to the same memory locations.
+
+      ## Race conditions ('data races') thus can arise when two or more threads try to access the same
+         memory location, with at least one of them trying to perform a 'write' operation.
+
+      ## The programmer, not Tomcat, is responsible for ensuring 'thread-safe' memory access within a web app.
+
+         ### This is hard to do well with low-level, synchronized blocks:
+
+                synchronized(lock) {
+                   // ensures 'mutual exclusion', hence thread safey: single-threaded execution only
+                }
+
+ # Traditional Java ways to address this issue: the Java Application Server with both a
+   web and an EJB (Enterprise JavaBean) container:
+
+
+                  not thread safe           thread safe
+                       \                        /
+   web request  +---------------+        +---------------+
+  ------------->| web container |<------>| EJB container |  ## Session EJBs: popular thread-safe 'request handlers'
+                +---------------+        +---------------+
+                      /                         \
+              'presentation layer'        'app logic layer'
+
+ # Java now has efficient, high-level, thread-safe data types and data structures in 
+   java.util.concurrent and its subdirectories.
+
+       Examples:
+
+             Type                      
+
+        ArrayBlockingQueue      ## thread-safe channel, with a backing array as the implementation
+        ConcurrentHashMap       ## thread-safe map implemented as a partitioned hash table
+        CopyOnWriteArrayList    ## thread-safe list implemented into partitions
+        AtomicInteger           ## thread-safe integer
+        AtomicIntegerArray      ## thread-safe array of same
+
+           

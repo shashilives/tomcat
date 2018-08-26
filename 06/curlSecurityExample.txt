@@ -1,0 +1,61 @@
+
+ -- Trace of a full security example: SSL + users/roles
+
+  # The setup:
+
+    -- Tomcat has been configured for HTTPS connections.
+
+    -- The web app and Catalina have been configured to let Catalina do user authentication/authorization.
+
+    -- The 'curl' utility is used to issue a request over HTTPS to a deployed web app (a web site).
+ 
+  # What the 'curl' output means:
+
+    -- A line that starts with a star * describes what's happening under the hood.
+       In this case, 'curl' (the client) and Tomcat (the HTTPS server) are doing the
+       HTTPS 'handshake'.
+
+    -- A line that starts with > comes from 'curl', the client. 
+       In this case, 'curl' issues a request against the 'predictions' web site,
+       sending a username ('moe') and password ('MoeMoe') in the HTTP header (key is 'Authorization')
+
+    -- A line that starts with < is output from Tomcat to the client.
+
+=================================================
+
+* About to connect() to localhost port 8443 (#0)
+*   Trying ::1... connected
+* Connected to localhost (::1) port 8443 (#0)
+* successfully set certificate verify locations:
+*   CAfile: none
+  CApath: /etc/ssl/certs
+* SSLv3, TLS handshake, Client hello (1):
+* SSLv3, TLS handshake, Server hello (2):
+* SSLv3, TLS handshake, CERT (11):
+* SSLv3, TLS handshake, Server key exchange (12):
+* SSLv3, TLS handshake, Server finished (14):
+* SSLv3, TLS handshake, Client key exchange (16):
+* SSLv3, TLS change cipher, Client hello (1):
+* SSLv3, TLS handshake, Finished (20):
+* SSLv3, TLS change cipher, Client hello (1):
+* SSLv3, TLS handshake, Finished (20):
+* SSL connection using EDH-RSA-DES-CBC3-SHA
+* Server certificate:
+    ...
+*   SSL certificate verify result: self signed certificate (18), continuing anyway.  
+* Server auth using Basic with user 'moe'
+
+> GET /predictions HTTP/1.1
+> Authorization: Basic bW9lOk1vZU1vZU1vZQ==
+> User-Agent: curl libcurl OpenSSL zlib libidn
+> Host: localhost:8443
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+< Server: Apache-Coyote/1.1
+< Cache-Control: private
+< Transfer-Encoding: chunked
+...
+<
+<html>
+...

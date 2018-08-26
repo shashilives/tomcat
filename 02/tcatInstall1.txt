@@ -1,0 +1,76 @@
+
+ -- Quick and dirty Tomcat install (no verfication -- that's coming later)
+
+ # Two ways to install: 'verified' and 'unverified'
+   ## To begin, we'll do 'unverified'.
+
+ # Strong recommendation: do the 'verfied' install. If you'd like to practice
+   with the unverfied install, download Tomcat in ZIP format -- and then delete the ZIP.
+   ## Follow up with a verified install, covered in the next two lessons.
+
+ # Dependencies: 
+
+   Define an environment variable named JAVA_HOME that points to the install
+   directory of your Java JDK. 
+
+   If you have only the JRE (JVM but no compiler, etc.), then define the environment
+   variable JRE_HOME to point to the JRE install directory.
+
+   ## The install directory can be tricky, particularly on a Mac.
+
+   ## Where Java is installed doesn't matter: JAVA_HOME just points to it.
+
+      ### On Linux systems, 
+
+             /usr/local/<Java install> 
+
+          is a typical install directory.
+
+      ### On Windows, 
+
+             C:\Program Files\<Java install> 
+
+          is a typical install directory.
+
+      ### On a Mac (El Capitan), 
+
+             /Library/Java/JavaVirtualMachines/jdk<version>.jdk/Contents/Home 
+
+          is a typical install directory.
+
+--------------------------------------------------------------------------------------------------------
+
+ # Steps to install:
+
+ 1. Go to the Tomcat download page: http://tomcat.apache.org/
+
+ 2. Check the link to 'Versions' (http://tomcat.apache.org/whichversion.html) to determine
+    which version best meets your needs.
+
+    ## Recommendation: latest 'stable' version (as of this writing, 8.x).
+
+    -- Later versions are, in general, backwards compatible: web apps deployed in earlier
+       versions should deploy in later versions. 
+
+ 3. Download the archive from the recommended mirror server, having picked the format you prefer
+    (for instance, ZIP format -- less than 10MB).
+
+ 4. Unpack the archive wherever you like on the local system. For a learning (versus production)
+    environment, I recommend installing Tomcat in your 'home' directory -- that way there's no
+    OS issues regarding permissions.
+
+ 5. Let TOMCAT_HOME be your install directory. There's a 'bin' subdirectory:
+
+                         TOMCAT_HOME
+                              |
+                             bin
+
+ *6. Execute the 'startup' script in TOMCAT_HOME/bin
+
+    -- On Unix-like systems, 'startup.sh'
+    -- On Windows, 'startup.bat'
+
+ *7. Open a browser to: http://localhost:8080
+
+ * means 'optional': if you want a verified install, skip steps 6 and 7.
+

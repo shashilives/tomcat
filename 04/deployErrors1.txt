@@ -1,0 +1,60 @@
+ -- Deployment errors: what can go wrong and why
+
+ # Web apps can be tricky to debug because, of course, an error might not 
+   show up until the app is deployed -- an extra challenge.
+
+   ## Common cases:
+
+      -- bad config file: the XML file doesn't parse
+
+      -- bad JSP script: compiler-error when Jasper tries to translate into a servlet
+
+      -- plain-old-Java problems: null object references, etc.
+
+      -- missing library files
+      
+      -- right web-app artifact, but packaged in the wrong place      
+      ...
+------------------------------------------------------------------------------------------------------
+
+ # WAR file is deployed to Tomcat, but Tomcat does not 'unwar' (unpack) the file.
+
+   ## Example 1: The WAR file 'hi.war' contains the deployment file WEB-INF/web.xml:
+
+     <?xml version = "1.0" encoding = "ISO-8859-1"?>
+     <web-app>
+         <servlet>
+             <servlet-name>testServlet</servlet-name>
+             <servlet-class>p1.TestServlet</servlet-class>
+         </servlet>
+         <servlet-mapping>
+             <servlet-name>testServlet</servlet-name>
+             <url-pattern>/*</url-pattern>
+         </servlet-mapping>
+ ---->
+      ### This XML file is ill-formed because the end tag </web-app> is missing.
+
+      ### Tomcat will not unwar the file. Here's the gist of the error in TOMCAT_HOME/logs/catalina.out
+          For Windows, the log file will be catalina.<today's date>.out.
+;;;;
+SEVERE [localhost-startStop-5] org.apache.tomcat.util.descriptor.web.WebXmlParser.parseWebXml 
+       Parse error in application web.xml file at file:/home/kalin/tomcat8/webapps/servlet/WEB-INF/web.xml
+       org.xml.sax.SAXParseException; systemId: file:/home/kalin/tomcat8/webapps/servlet/WEB-INF/web.xml; 
+       lineNumber: 13; columnNumber: 1; 
+       XML document structures must start and end within the same entity.
+    at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.createSAXParseException(ErrorHandlerWrapper.java:203)
+    at com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper.fatalError(ErrorHandlerWrapper.java:177)
+    ...
+SEVERE [localhost-startStop-5] org.apache.tomcat.util.descriptor.web.WebXmlParser.parseWebXml 
+                               Occurred at line 13 column 1
+SEVERE [localhost-startStop-5] org.apache.catalina.startup.ContextConfig.configureStart 
+                               Marking this application unavailable due to previous error(s)
+SEVERE [localhost-startStop-5] org.apache.catalina.core.StandardContext.startInternal 
+                               One or more components marked the context as not correctly configured
+SEVERE [localhost-startStop-5] org.apache.catalina.core.StandardContext.startInternal 
+                               Context [/servlet] startup failed due to previous errors
+;;;;
+
+ # In general, if Tomcat doesn't unwar a WAR file, then the 1st place to look is at the configuration files
+   in the WAR -- they don't parse.
+----------------------------------------------------------------------------------------------

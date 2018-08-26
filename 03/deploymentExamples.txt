@@ -1,0 +1,51 @@
+
+ -- Deployement examples
+
+ # For each example, the output is edited from the output of a 'jar' commmand. The names of
+   the WAR files are shown in each example. Here are the three 'jar' commands used, with
+   % as the command-line prompt:
+
+     % jar tvf temp2.war   ## 1st example
+     % jar tvf preds.war   ## 2nd example
+     % jar tvf jpaTest.war ## 3rd example
+
+   ## The output is edited for readability.
+
+   ## The WAR files are included in the ZIP working file 'deployExamples.zip'. The first two can be deployed 
+      as is, but the third (jpaTest.war) expects a PostgreSQL database to be running--so you'd need to install the DB 
+      and then create and popullate the table to run. I've included the examples mainly to highlight the structure 
+      of a correctly deployed WAR file.
+
+   -- Example 1: a minimalist web app for temperature conversion (temp2.war)
+
+        WEB-INF/web.xml          ## web.xml is technically optional, but almost always present
+        convert.jsp              ## JSP script
+        error.jsp                ## error page -- control goes here if something goes wrong
+        input.html               ## input page for a temperature to convert
+
+   -- Example 2: A JSF/Managed Bean example (preds.war):
+
+        WEB-INF/web.xml                                ## standard config
+        WEB-INF/faces-config.xml                       ## JSF-implementation config
+        WEB-INF/classes/beans/Controller.class         ## backend POJO class
+        WEB-INF/classes/beans/Organization.class       ## ditto
+        WEB-INF/classes/beans/Prediction.class         ## ditto
+        WEB-INF/lib/javax.faces.jar                    ## JSF implementation 
+        ajax.xhtml                                     ## JSF page
+        styles.css                                     ## style sheet
+
+  -- Example 3: A JPA (Java Persistence API) example with PostgreSQL as backend DB (jpaTest.war):
+
+        WEB-INF/web.xml                                      ## standard config
+        WEB-INF/classes/META-INF/persistence.xml             ## JPA config
+        WEB-INF/classes/test/PersistenceManager.class        ## class to handle DB interaction
+        WEB-INF/classes/test/Product.class                   ## 'model' class
+        WEB-INF/classes/test/Product_.class                  ## low-level 'model' class 
+        WEB-INF/classes/test/ProductsController.class        ## POJO 'controller'
+        WEB-INF/lib/eclipselink.jar                          ## EclipseLink (JPA implementation)
+        WEB-INF/lib/javax.persistence.jar                    ## standard JPA implementation
+        WEB-INF/lib/org.eclipse.persistence.jpa.modelgen.jar ## more EclipseLink
+        WEB-INF/lib/postgresql-jdbc.jar                      ## PostgreSQL 'driver', etc.
+        confirm.jsp                                          ## client UI
+        style.css                                            ## style sheet
+

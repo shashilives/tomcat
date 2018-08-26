@@ -1,0 +1,45 @@
+
+ -- Tomcat and Java: A quick look behind and look ahead
+
+ # Recall that, in installing Tomcat, we define JAVA_HOME (or JRE_HOME) as an environment variable
+   that points to the Java JDK (or JRE) install directory.
+
+   ## Tomcat's implemented in Java, and designed precisely to handle Java web apps.
+
+   ## Output from invoking the 'startup' script (startup.sh or startup.bat) at the command-line:
+
+      % ./startup.sh
+        Using CATALINA_BASE:   /home/kalin/tomcat8
+        Using CATALINA_HOME:   /home/kalin/tomcat8
+        Using CATALINA_TMPDIR: /home/kalin/tomcat8/temp
+        Using JRE_HOME:        /usr/local/java8
+        Using CLASSPATH:       /home/kalin/tomcat8/bin/bootstrap.jar:/home/kalin/tomcat8/bin/tomcat-juli.jar
+        Tomcat started.
+
+       ### To confirm that Tomcat's indeed running, we could open a browser to http://localhost:8080, or
+           use the 'curl' utility (https://curl.haxx.se/) from the command-line:
+
+             % curl localhost:8080
+     
+       ### For now, CATALINA is Tomcat's main component -- its 'web container'.
+     
+       ### It's common to conflate 'Tomcat' (the web server) and 'Catalina' (the main component).
+
+ # Tomcat runs as a Java 'application', which means as a single process at the system level.
+
+   ## Tomcat implements the 'one-thread-per-request' model of handling client requests:
+
+                           
+             TCP or HTTP request        request handed off to a thread from a thread pool
+                       \   +--------+              /
+      client request ----->| Tomcat |----->client-handling thread
+                           +--------+
+
+      ### Tomcat is thus multi-threaded, and multi-threading is the standard Java way to
+          manage 'client concurrency'.
+
+          #### Modern Tomcat uses a mix of multi-threading and non-blocking ('asynchronous') I/O
+               to manage concurrent client requests.
+
+ # Tomcat can be managed (even remotely) through JMX (Java Management Extensions), in particular 
+   by exposing the web container (Catalina) as an MBean.

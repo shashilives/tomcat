@@ -1,0 +1,68 @@
+
+ -- Web servers and client concurrency
+
+ # As client requests hit a web server, they're queued up ('serialized'):
+
+    ReqN...Req3  Req2  Req1 +------------+
+    ----------------------->| web server |  ## requests queued up until a 'connection refused' error
+                            +------------+
+
+ # Although the requests are serialized, they cannot be handled in serial fashion for two main reasons:
+
+   -- An ill-formed request might 'block' the server indefinitely, thereby starving all of the requests behind it.
+
+   -- Even without indefinite blocking, requests later in the queue would have long response times -- and feel starved.
+
+   -- Modern web servers are thus 'concurrent' rather than 'iterative' in their handling of client requests.
+
+ # In short, a web server must handle client requests concurrently rather than one after the other.
+
+   ## The order in which the client responses go out may not match the order in which the requests come in because,
+      for example, an earlier-in-the-queue request might take longer to process than a later-in-the-queue request.
+
+      ### Randomness may help to determine the order in which requests are completed: the key point is that all
+          queued requests should get attention.
+
+      ### If the server can't handle any more requests concurrently, a 'Connnection Refused' error should be sent
+          back to any new requests.
+
+   ## On a multi-processor machine (a production web server would run on such a machine), concurrency becomes
+      literal parallelism: mulitiple requests can be handled literally at the same time because request-handling 
+      can be done on separate processors.
+
+ # Different web servers support client concurrency in different ways:
+
+   -- Early web servers (e.g., Apache1) used multi-processing: each incoming request is dispatched to a 
+      separate process for handling.
+
+   -- Modern web servers (e.g., Apache2, Nginx, IIS, Tomcat) tend to use _some_ mix of
+      multi-processing, multi-threading, and non-blocking ('asynchronous') I/O.
+ 
+ # Tomcat uses the preferred Java strategy for concurrency: multithreading.
+
+   ## Tomcat adopts the one-thread-per-request model by handing off each request to a Java java.lang.Thread for handling:
+
+                              +------------+ assign to
+         client request------>| dispatcher |----------->thread from a pre-built pool
+                              +------------+
+
+      ### The Tomcat core executes as a single process (a Java application) with multiple threads.
+
+      ### In modern Tomcat, reading the request uses non-blocking I/O for efficiency.
+
+      ### At start-up, Tomcat creates thread pools to amortize the cost of thread creation over the server's up time.
+
+          #### There are thread pools per connector: a thread pool for HTTP, another for HTTPS, another for AJP, etc.
+
+ # Tradeoffs of multi-threading:
+
+   -- good news: switching on a processor between two threads in the same process has very low overhead
+
+   -- bad news: threads within the same process share the same 'address space', that is, have access to
+                the same memory locations.
+
+      ## The programmer is thus responsible for 'synchronizing' (coordinating) thread access to shared locations
+         in order to avoid 'data races' (aka 'race conditions') in which, for instance, two threads try to
+         write to the same memory location at exactly the same time.
+
+

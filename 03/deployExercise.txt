@@ -1,0 +1,41 @@
+
+ Deployment exercise
+
+ # The ZIP file 'deployExercise.zip' contains the following pieces:
+
+   -- hiA.html              ## links to hiB.html and the HiServlet
+   
+   -- hiB.html              ## link to hiA.html
+   
+   -- web.xml               ## sets up link for servlet (more on this later)
+   
+   -- p1.HiServlet.java     ## fully qualified named of servlet
+
+ # The exercise is to build a deployable WAR file with these contents, and then
+   to deploy and test the deployed WAR.
+
+   ## The WAR file's name is arbitrary.
+
+   ## If you use my Ant script, you'd have a directory structure that looks like this:
+
+           build.xml              ## the 'working directory' from which you'd issue the 'ant' command
+	      |
+	     src                  ## right below the working directory: text files, including HTML and XML
+	      |
+	      p1                  ## subdirectory representing the package p1
+	       -- HiServlet.java  ## Java source
+
+       % ant -Dwar.name=hiThree deploy   ## ant command to deploy      
+
+ # The artifacts are few in number and relatively simple; hence, even a
+   manual deployment would not be too bad.
+
+   -- But the preferred approach is to use a script (e.g., my Ant script or the
+      one available from the Tomcat download page under 'Deployer', a Maven script -- or
+      even an ad hoc script).
+
+
+
+
+                 
+

@@ -1,0 +1,42 @@
+
+ -- Wrapup of troubleshooting
+
+ # In 'localhost' context, Tomcat provides lots of troubleshooting help.
+
+ # Web app issues (let's assume WAR deployment, as it's the standard):
+
+   -- Bad XML config files
+
+      ### The sympton is that the deployed WAR file is not 'unpacked' ('unwared').
+
+      ### These errors are usually easy to find, but the XML files could be parsed in the course 
+          of generating the WAR file.
+
+   -- JSP translation-time errors: bad Java syntax in the JSP code snippets, missing libraries, etc.
+
+      ### Tomcat has nice debugging help, but pre-compilation may be the way to go if the web app
+          relies heavily on JSP: gain in efficiency and convenience.
+
+      ### Even if you don't pack the WAR file with the .class files generated from the precomile, but go
+          instead with the JSP, it still may be a time-saver to precomile.
+
+   -- Run-time errors in servlets, POJOs, etc.: Tomcat again provides help, in particular by displaying a
+      page about the method that threw the exception.
+
+      ### Customized logging through System.err and System.out statements can be quite helpful.
+
+ # Tomcat and system issues
+ 
+   -- A web app seems to have died in that the app, which once handled requests, no longer seems to do so.
+
+      ## The Tomcat web console lets us redeploy the app easily. If this fails, unloading and reloading are
+         worth a shot.
+
+   -- System resources (in particular, heap storage) seem to be running low.
+
+      ## Tomcat has monitoring and diagnostic capabilities.
+
+      ## In the worst case, TOMCAT_HOME/bin/shutdown.sh (or .bat on Windows) is a graceful way to stop 
+         Tomcat, give it a chance to rest, and then restart it.
+
+

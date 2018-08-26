@@ -1,0 +1,125 @@
+
+  -- Tomcat and virtual hosting
+
+  # A scenario to motivate 'virtual hosting':
+
+     -- We've a small company with two product lines: outdoor clothing, and yard equipment.
+        There's some connection between the product lines, but we'd like separate 'domain names' for each.
+
+        ## In 'www.google.com' and 'www.yahoo.com', the domain names are 'google.com' and 'yahoo.com', respectively.
+
+        ## We're willing to register two different domain names with a 'domain name registrar', a company
+           with the power to reserve a domain name (e.g., GoDaddy is a well know 'domain name registrar').
+
+        ## Our domain names will be: acme.outdoorduds.com and acme.gardening.com.
+
+     -- For now, we've one server (need a backup!) or many one small cluster of servers. For now, assume
+        just one server for simplicity.
+
+        ## The key point is that we want requests to two distinct domains to wind up at the same server(s):
+
+           Requests such as
+
+             http://outdoorduds.com:8080/     ## domain name is registered so DNS lookup works
+          
+           and
+
+             http://yardstuff.com:8080/       ## domain name is registered so DNS lookup works
+
+           should wind up at our single web server (or cluster).
+
+  # Out of the box, Tomcat already has one 'host' configured: localhost.
+    ## But 'virtual hosting' becomes interesting only with more than one configured host.
+
+  # How does virtual hosting work in Tomcat?
+
+    ## The notion of an 'Engine' is central in the Tomcat architecture for virtual hosting.
+
+       ### An Engine serves as an entry point into the Catalina web container, which in turn
+           can have multiple 'virtual hosts'. Here's a depiction:
+
+                                         web container
+           dispatch request to a host       /
+                         \             +---------+
+    HTTP request------>Engine--------->|  host1  |  ## the Engine is an 'entry point' to the web container
+                         /             |  host2  |  
+    Tomcat names this 'Catalina'       |   ...   |  ## by default, Tomcat has one Engine -- and names it 'Catalina'
+                                       |  hostN  |
+                                       +---------+
+
+       ### An Engine's job is to analyze an HTTP request, dispatching the request to the appropriate (virtual) host.
+
+    ## The steps:
+
+       ### We can create a virtual host 'on the fly' with the Tomcat web console, but the permanent fix is to edit
+           the main config file TOMCAT_HOME/conf/server.xml.
+
+       1. Backup TOMCAT_HOME/conf/server.xml (just in case).
+
+       2. Edit the Engine section. Here's what I did for illustration:
+
+  #####
+  <!-- An Engine represents the entry point (within Catalina) that processes
+         every request.  The Engine implementation for Tomcat stand alone
+         analyzes the HTTP headers included with the request, and passes them
+         on to the appropriate Host (virtual host).
+         Documentation at /docs/config/engine.html -->
+    <!-- You should set jvmRoute to support load-balancing via AJP ie :
+    <Engine name="Catalina" defaultHost="localhost" jvmRoute="jvm1">
+    -->
+    <Engine name="Catalina" defaultHost="localhost">
+
+      <!--For clustering, please take a look at documentation at:
+          /docs/cluster-howto.html  (simple how to)
+          /docs/config/cluster.html (reference documentation) -->
+      <!--
+      <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"/>
+      -->
+
+      <!-- Use the LockOutRealm to prevent attempts to guess user passwords
+           via a brute-force attack -->
+      <Realm className="org.apache.catalina.realm.LockOutRealm">
+        <!-- This Realm uses the UserDatabase configured in the global JNDI
+             resources under the key "UserDatabase".  Any edits
+             that are performed against this UserDatabase are immediately
+             available for use by the Realm.  -->
+        <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+               resourceName="UserDatabase"/>
+      </Realm>
+
+      <Host name="localhost"  appBase="webapps"
+            unpackWARs="true" autoDeploy="true">
+
+        <!-- SingleSignOn valve, share authentication between web applications
+             Documentation at: /docs/config/valve.html -->
+        <!--
+        <Valve className="org.apache.catalina.authenticator.SingleSignOn" />
+        -->
+        <!-- Access log processes all example.
+             Documentation at: /docs/config/valve.html
+             Note: The pattern used is equivalent to using pattern="common" -->
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+               prefix="localhost_access_log" suffix=".txt"
+               pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+      </Host>
+      <!-- Newly added virtual host -->
+      <Host name="outdoorduds.com"               ## domain name
+	    appBase="outdoorapps"                ## TOMCAT_HOME/outdoorapps holds the WAR files
+	    unpackWARs="true"                    ## unpack, as happens in TOMCAT_HOME/webapps
+	    autoDeploy="true">                   ## 'hot' deploy
+	<Alias>www.outdoorduds.com</Alias>       ## other features are configurable as well
+      </Host>
+      
+      <!-- Add the other virtual host here -->
+      <Host></Host>
+    </Engine>
+    #####
+
+       3. Restart Tomcat if it's running.
+ 
+       4. Deploy ROOT.war to the new appBsase, TOMCAT_HOME/outdoorapps -- now we have a
+          'root context' for the new domain name.
+
+          *** Customized context information, in the form of a separate 'context.xml'
+              configuration document, could be added.
+

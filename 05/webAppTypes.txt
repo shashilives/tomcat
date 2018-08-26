@@ -1,0 +1,45 @@
+
+ -- Web app types that Tomcat can handle
+
+ # At the start, the point was made that Tomcat is "Java centric" -- now it's time for clarification.
+
+                    java
+                     |
+            +--------+--------+
+            |                 |
+         language       virtual machine
+            /                \
+          javac             java
+
+   ## Tomcat's written in Java (language), but can handle any web app with JVM-compatiable byte codes (run-time).
+
+      -- JRuby (on Rails), Clojure, Scala, Java,...
+
+   ## There are Tomcat extensions (e.g., TomEE at http://tomee.apache.org/apache-tomee.html) that come with
+      an EJB container and other high-level EE components, all of which can be deployed as WAR files.
+---------------------------------------------------------------------------------------------------------------------
+
+ # Three broad categories of web app, but the distinctions among them aren't sharp:
+
+   -- wite sites: HTML-centric, nowadays with lots of web assessts: documents, stylesheets, scripts, images,...
+
+   -- web services: ideally, groupings of 'pure functions' that deliver data and functionality to clients
+ 
+      ## REST-style and SOAP-based: Tomcat can handle both.
+
+   -- web sockets: implemented through TCP-based rather than HTTP-based connections
+
+      ## lower overhead, relief from the request/response pattern that dominates in HTTP
+
+   ## One and the same deployed web app might contain a mix of all three:
+
+      -- A 'chat room' web app might be a mix of HTML documents and web sockets.
+
+      -- A web site might have HTML documents with embedded JavaScript, which issues
+         client requests against a web service packaged in the very same WAR as the web site.
+-----------------------------------------------------------------------------------------------------------------
+
+ # What follows are three example web apps so that we've concrete examples of deployed WARs as 
+   web sites and web services, with web sockets thrown into the mix with a web site.
+
+

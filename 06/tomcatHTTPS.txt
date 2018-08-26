@@ -1,0 +1,72 @@
+
+ -- Setting up Tomcat for HTTPS connections
+
+    # The setup requires two major pieces:
+
+      1. We need a DC. For development, a 'self-signed' DC is good enough,
+         although it's inadequate for production.
+
+      2. We need to configure Tomcat so that it can locate our self-signed DC.
+
+    # Step 1: create a self-signed DC
+
+      ## Core Java ships with a 'keytool' utility that can be used to generate a DC.
+         At the command line, enter this command (with % as the command-line prompt):
+
+                           'use the RSA algorithm'
+                                /
+           % keytool -genkey -keyalg RSA -keystore devel.keystore
+                       /                             \
+             'generate a key pair'             'put DC in this keystore, creating it if necessary'
+
+    # Step 2: configure Tomcat so that it can find the DC from Step 1
+
+      ## Backup and then edit Tomcat's main configuration file: TOMCAT_HOME/conf/server.xml
+
+         ### Here is the relevant section:
+
+           <!-- Define a SSL/TLS HTTP/1.1 Connector on port 8443
+               This connector uses the NIO implementation that requires the JSSE
+               style configuration. When using the APR/native implementation, the
+               OpenSSL style configuration is required as described in the APR/native
+               documentation -->
+           <!--
+           <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+                      maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
+                      clientAuth="false" sslProtocol="TLS" />
+           -->
+
+         ### Note that the 'Connector' element is commented out. Uncomment the section and,
+             for convenience, add a few elements. I've done so below, with comments after each
+             line:
+
+             <Connector port="8443"                                              
+                        protocol="org.apache.coyote.http11.Http11NioProtocol"    
+                        maxThreads="150"                                        
+                        SSLEnabled="true"                                       
+                        scheme="https"                                         
+                        secure="true"                                         
+                        clientAuth="false"                                  
+                        sslProtocol="TLS"                                   
+                        keystoreFile="${user.home}/devel.keystore"         
+                        keystorePass="qubits" />                         
+
+    # With these changes in place, do the following:
+ 
+      ## If Tomcat is running, restart it.
+
+      ## Open a browser to: https://localhost:8443
+
+         ### Depending on configuration, your browser likely will complain about the 'self-signed' DC stored in
+             the 'devel.keystore' keystore--you'll get warnings about how 'unsafe' it is to proceed.
+       
+
+    # Here's an uncommented entry from server.xml:
+
+       <Connector executor="tomcatThreadPool"
+                  port="8080" protocol="HTTP/1.1"
+                  connectionTimeout="20000"
+                  redirectPort="8443" />
+
+         
+                    

@@ -1,0 +1,68 @@
+
+ -- WAR file deployment: too tedious to do by hand
+
+ # IDEs (e.g., Eclipse, IntelliJ, NetBeans) use scripts under the hood to automate deployment.
+
+ # Various scripting languages (e.g., Ant, Maven, 'shell', 'bat') are available for automating WAR deployment.
+
+ # Tomcat uses an Ant script to deploy from the Tomcat management console (the web GUI), and makes the full
+   script available for downloads under 'Deployer' on the download page (http://aparche.tomcat.org).
+   There's documentation at:
+   
+      https://tomcat.apache.org/tomcat-8.0-doc/deployer-howto.html#Deploying_using_the_Client_Deployer_Package
+
+   ## Tomcat also has a Maven plugin on the download page:
+
+      http://tomcat.apache.org/maven-plugin.html for documentation.
+
+ # For demo purposes, I'm going to use my own Ant script: very simple, saves the .java source files for
+   convenience in the constructed WAR; doesn't require a valid 'unpacked' web app to begin
+
+   ## Dependencies: Apache Ant (http://ant.apache.org/) should be installed, version 1.6x or greater.
+
+      ### To check on the installation from the command line: % ant -version
+
+   ## My Ant script is a single file, 'build.xml', and starts out with a page or so of documentation.
+
+ # An Ant script consists of 'tasks', which can be ordered for dependencies. Here's a high-level view,
+   with low-level details to follow:
+
+   -- Default task is 'deploy'.                        ## any name would do
+ 
+   -- The 'deploy' task requires the 'compile' task.   ## dependency
+
+   -- The 'compile' task requires the 'build' task.    ## and another
+
+   -- The 'build' task requires the 'clean' task.      ## ditto
+   ...
+   
+              requires          requires        requires        requires
+       deploy---------->compile---------->build---------->clean---------->...
+
+   ## The tasks are laid out in an XML file whose default name is 'build.xml'. 
+
+      ### This file may link in other files, typically with a '.properties' extension (e.g., 'deployer.properties')
+
+      ### At the command-line, 
+
+          % ant                  ## execute the default task in the default task file 'build.xml'
+
+          % ant -f myBuild.xml   ## execute the default task in the specified task file 'myBuild.xml'
+
+   ## Tasks can be specified at the command-line:
+
+      Examples:
+
+      % ant compile    ## perform the 'compile' task, and any other task that it requires; and so on.
+
+      % ant build      ## perform the 'build' task,...
+
+      % ant            ## perform the default task
+
+      % ant deploy     ## ditto
+
+      % ant start      ## e.g., start Tomcat 
+
+
+   
+

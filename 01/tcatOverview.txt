@@ -1,0 +1,42 @@
+ -- Overview of the Apache Tomcat Web Server (http://tomcat.apache.org)
+
+ # Tomcat is targeted at:
+
+   -- Java programmers who need a really good web server to publish their web apps
+
+   -- sys admins who need to support the publishing of Java web apps
+
+ # Tomcat is a
+
+       -- free
+       -- production-grade
+       -- lightweight	 
+
+       -- open-source
+       -- cross-platform  
+       -- no-fuss
+
+   web server.
+
+   ## It's Java-centric: written in Java, designed to host Java web apps.
+
+   ## It's easy to install on any system.
+
+   ## Out of the box, with no configuration, it's good to go. Customization is usually in small pieces.
+
+   ## Versioning is incremental: sensible improvements, no radical changes
+
+ # We'll cover Tomcat in-depth and hands-on:
+
+   -- installation
+   -- starting/stopping
+   -- app deployment
+   -- management/customization
+   -- security
+   -- troubleshooting
+
+
+
+
+   
+

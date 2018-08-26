@@ -1,0 +1,69 @@
+
+ -- Tomcat realms in container-managed users/roles security
+
+    # 'Realms' are the Tomcat-side of users/roles security.
+    
+      ## The 'web.xml' config is the web-app side.
+
+    # A 'realm' is a datastore with user identities (e.g., login  names), credentials (e.g., passwords),
+      and security roles.
+   
+      ## A given realm also includes whatever code infrastructure is required for realm use.
+
+      ## A realm is created and configured in the main Tomcat config file, TOMCAT_HOME/conf/server.xml
+      
+         ### Once configured, the realm is active when Tomcat is started/restarted.
+
+    # Background technologies:
+
+      ## JNDI: Java Naming and Directory Interface, an API for:
+
+         ## Associating names with resources within a prescribed syntax (the 'Naming' part).
+
+            -- Sample name: url = "jdbc:postgresql://localhost:5432/usersRoles"
+
+         ## Associating names with resources and specifying attributes on such 'bindings' (the
+            'Directory' part)
+
+         ## Typically described as the Java EE 'naming and directory service'.
+
+            ### JNDI is the 'interface', and a 'provider' furnishes the implementation.
+
+    # The built-in security realms are:
+
+      -- JDBCRealm: auth/auth info is stored in a relational database, and accessed through a JDBC driver.
+
+      -- DataSourceRealm: auth/auth info is stored in a relational database, accessed through a named
+         JNDI JDBC 'DataSource'.
+
+      -- JNDIRealm: auth/auth info is stored in an LDAP based directory server, accessed through a JNDI provider.
+
+      -- UserDatabaseRealm: auth/auth info stored in an UserDatabase JNDI resource, which is typically
+         persisted as an XML document on the local file system, with TOMCAT_HOME/conf/tomcat-users.xml
+	 as the default. This realm is well suited to development.
+
+         -- UserLockOutRealm: subtype to prevent brute-force attacks that guess passwords ('dictionary attacks')
+                            
+      -- MemoryRealm: in effect, an earlier version of UserDatabaseRealm (but without JNDI-based lookups)
+
+      -- JAASRealm: auth/auth info access through the JAAS (Java Authentication and Authorization Service)
+         framework, with complete flexibility in how the info is persisted. Used in Java Application Servers.
+
+      ## Users can create and configure additional realms.
+
+         -- Examples from TOMCAT_HOME/conf/server.xml and Tomcat documentation:
+
+         <Realm className="org.apache.catalina.realm.LockOutRealm">
+           <!-- This Realm uses the UserDatabase configured in the global JNDI
+                resources under the key "UserDatabase".  Any edits
+                that are performed against this UserDatabase are immediately
+                available for use by the Realm.  -->
+           <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+                  resourceName="UserDatabase"/>
+         </Realm>
+
+         <Realm className="org.apache.catalina.realm.JDBCRealm"
+                driverName="org.gjt.mm.mysql.Driver"
+                connectionURL="jdbc:mysql://localhost/authority?user=dbuser&amp;password=dbpass"
+                userTable="users" userNameCol="user_name" userCredCol="user_pass"
+                userRoleTable="user_roles" roleNameCol="role_name"/>

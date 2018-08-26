@@ -1,0 +1,67 @@
+
+ -- Remote monitoring and management
+
+ # Quick detour on terminology:
+
+   -- I've been using TOMCAT_HOME to designate the install directory for the Tomcat binaries.
+      ## The goal was to avoid confusion between CATALINA_HOME and CATALINA_BASE, clarified next.
+
+   -- CATALINA_HOME = my TOMCAT_HOME: install directory for Tomcat binaries on the local machine
+
+   -- CATALINA_BASE = working directory for my personal Tomcat instance, as we could have several
+      running on the local system.
+      ## Having several Tomcat instances running isn't so popular now as it once was; might be
+         used, for example, in a teaching environment -- each student gets a Tomcat instance.
+
+   -- If there's just one instance of Tomcat running (my strong preference), then
+      CATALINA_HOME = CATALINA_BASE.
+      ## These environment variables need not be set explicitly: Tomcat figures it out.
+
+ # Java-centric monitoring/management tools:
+
+   -- JConsole comes with the JDK (since 1.5). At the command-line:
+
+        % jconsole
+ 
+      ## JConsole complies with JMX (Java Management Extensions), and Tomcat exposes components as MBeans.   
+
+   -- VisualVM (https://visualvm.java.net/) also is worth a look.
+
+ # Making JConsole easier to use for Tomcat monitoring:
+
+   0. Best to shutdown Tomcat first.
+
+   1. In TOMCAT_HOME/bin, create the file 'setenv.sh' ('setenv.bat' in Windows).
+
+   2. Add the following to this file:
+
+        export CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote"
+        export CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote.port=9876"
+        export CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote.authenticate=false"
+        export CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote.ssl=false"
+
+      ## For Windows, replace 'export' with 'set', and replace '$CATALINA_OPTS' with '%CATALINA_OPTS%'.
+
+      ## The port number 9876 (2nd line) can be set to any available port on the local system, but
+         it's easiest to pick a number > 1023.
+
+   3. Start Tomcat.
+
+ # Other options (and a recommendation)
+
+   ## For remote (or even local) _monitoring_, JConsole and VisualVM are great.
+
+   ## For remote _management_, I recommesh the 'ssh' (Secure SHell) utility.
+
+      ### 'ssh' is available on Windows from PuTTY (http://www.putty.org/).
+
+   ## For system-level monitoring, a tool such as Monit https://mmonit.com/monit/ is worth a look.
+
+
+
+
+  
+
+
+
+

@@ -1,0 +1,56 @@
+
+ -- Deployment rules -- how the packed (or unpacked) deployment should look
+
+ # What goes where?
+
+   -- configuration files ('deployment descriptors') occur under WEB-INF
+     
+      ## The standard config file, 'web.xml', occurs in the WEB-INF subdirectory
+
+      ## Other config files (e.g., 'sun-jws.xml') occur in WEB-INF or in a subdirectory rooted in WEB-INF
+
+      ## The config files are in XML format.
+
+   -- TLD (Type Library Description) files, which describe customized JSP tags, likewise occur in the
+      WEB-INF tree.
+
+      ## These files, like config files, are in XML format.
+
+   -- Programmer-compiled .class files occur in the WEB-INF/classes tree. 
+
+      Example: Given the source code
+
+         package foo.com;
+         public class SampleJavaBean {
+           //...
+         }
+
+      the compiled class SampleJavaBean.class would be put in the WEB-INF/classes/foo/com directory:
+
+                WEB-INF   ## must be spelled exactly like this
+                   |
+                classes   ## ditto: all .class files here or below
+                   |
+                  foo     ## start of my package name
+                   |
+                  com     ## end of my package name: SampleJavaBean.class is here
+
+   -- JAR files, which are expected to hold libraries and other implementation code (e.g., an
+      implementation of a customized tag) occur in the WEB-INF/lib subdirectory.
+
+ # Here's a summation:
+
+            top-level of WAR file    ## Could hold .html, .css, .jsp, .jsf, .js, and other file types
+                    |                ## not under deployment restrictions.
+                    |                ## However, we might put images in an 'images' subdirectory, JavaScript
+                    |                ## code in a 'scripts' subdirectory, HTML and CSS files in an 'assets' 
+                    |                ## subdirectory, and so on.
+                    |
+                 WEB-INF             ## WEB-INF for 'deployment descriptor' files (with .xml extensions)
+                    |
+          +---------+---------+
+          |                   |
+         lib               classes   ## WEB-INF/lib for archived code (JARs with .jar extensions)  
+                                     ## WEB-INF/classes for byte-code files (.class extensions)   
+                                      
+

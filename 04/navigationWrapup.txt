@@ -1,0 +1,65 @@
+
+ -- Navigation wrapup: the 404 issue
+
+ # Here's yet another depiction of the example we've been using, with 'hi3.war' as the deployed WAR file:
+
+                     hiTop.html    ## welcome file
+                         |
+               +---------+---------+
+               |                   |
+            web-assets          WEB-INF
+              -- hiNested.hmtl     | -- web.xml        ## sets 'welcome file' and aliases servelt
+                                classes
+                                   |
+                                   p1
+                                    -- HiServlet.class ## aliased as 'helloFromSerlvet'
+
+ # In 'hiTop.html', the link to 'hiNested.html' is:
+
+        <a href = 'web-assets/hiNested.html'>Nested hi</a>         ## relative path
+
+   -- Problem: the link is changed to
+
+        <a href = 'hiNested.html'>Nested hi</a>
+
+      The link now requires that 'hiNested.html' be at the top-level with 'hiTop.html',
+      but 'hiNested.html' is in the subdirectory 'web-assets'.
+
+      ## Result: 404 'Not Found' error when the link is followed (e.g., with a click)
+
+ # In 'hiNested.html', the to 'hiTop.html' is:
+
+        <a href = '../hiTop.html'>Top-level hi</a>                      ## relative path
+
+   -- Problem: the link's href is changed to
+
+        <a href = 'hiTop.html'>Top-level hi</a>   
+
+      The link now requires that 'hiTop.html' be in the 'web-assets' subdirectory with 'hiNested.html'.
+
+      ## Result: 404 'Not Found' error when the link is followed (e.g., with a click)
+
+-------------------------------------------------------------------------------------------------------------------------
+
+ -- Friendly recommendations:
+
+  # To avoid subtle navigational problems, my approach is to:
+
+      -- Put _all_ text files (e.g., HTML pages, stylesheets, /JSP/JSF/etc. scripts) in the
+         deployed WAR's top-level.
+
+      -- Alias every servlet in 'web.xml' with the URL pattern:
+
+           /<servletName>   ## alias-based path
+
+         For quick review, here's the web.xml entry in hi3.war:
+
+             <servlet-mapping>
+               <servlet-name>hiServlet</servlet-name>
+               <url-pattern>/helloFromServlet</url-pattern>
+             </servlet-mapping>
+  
+
+
+
+    

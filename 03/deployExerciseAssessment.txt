@@ -1,0 +1,57 @@
+
+ -- Options in the deployment exercise
+
+ # Packed or unpacked?
+
+   ## Packed is standard, and just as easy as unpacked.
+
+      ## Packed is more straightforward: there's one file, the WAR, to move around, backup, etc.
+
+      ## In short, there's no compelling reason to go 'unpacked'.
+
+ # Manual or automated == script or no script?
+
+   ## To opt for an IDE-based deployment is to opt for a script.
+
+   ## In a very simple case, manual works -- but manual doesn't scale.
+
+ # Which script to use?
+
+   ## Lots of choices, including Tomcat's own deployer script.
+
+   ## Pick one you like, or roll your own.
+
+ --------------------------------------------------------------------------------------------
+
+ -- The tricky part of compilation for web apps
+
+ # Data types such as 
+
+      javax.servlet.Servlet                   ## basic interface for lifecycle events
+      javax.servlet.ServletContext            ## interface for communicating with the containter
+      javax.servlet.http.HttpServlet          ## class for HTTP-based servlets
+      javax.servlet.http.HttpServletRequest   ## HTTP request as a Java map
+      javax.servlet.http.HttpServletResponse  ## channel for sending HTTP responses to a client
+
+   do not ship with core Java (JSE). 
+
+   ## They ship with Tomcat: TOMCAT_HOME/lib/servlet-api.jar 
+
+      ### For trouble-free compilation, TOMCAT_HOME/lib/*.jar should be on the classpath.
+
+   -- Example with this exercise: manual compilation
+
+      Here's the layout on my local file system, with TOMCAT_HOME pointing to the Tomcat install directory:
+
+            WEB-INF ## current working directory for the 'javac' command shown below
+               |
+            classes
+               |
+               p1
+                    ## source file HiServlet.java is here in the p1 subdirectory
+
+       % javac -cp .:$TOMCAT_HOME/lib/servlet-api.jar WEB-INF/classes/p1/HiServlet.java   ## Unix-like
+  
+       % javac -cp .;%TOMCAT_HOME%/lib/servlet-api.jar WEB-INF/classes/p1/HiServlet.java  ## Windows
+
+   ## A script would put the JAR files in TOMCAT_HOME/lib on the classpath.

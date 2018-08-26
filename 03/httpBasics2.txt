@@ -1,0 +1,101 @@
+
+ More HTTP basics
+
+ # Format of requests/responses
+
+    HTTP request:
+
+       start line   ## HTTP_method URI [HTTP version]        E.g.: POST /skiServ/dataVerifier HTTP/1.1
+       headers      ## Key/value pairs, with : as separator  E.g.: Content-Type: application/x-www-form-urlencoded
+       newline
+       newline
+       [body]       ## GET and DELETE have no body; POST and PUT have a body
+
+    HTTP response:      
+
+       start line   ## [HTTP version] Status code (numeric and English) E.g.: 200 OK
+       headers      ## Key/value pairs, with : as separator             E.gl: Server: Apache-Coyote/1.1
+       newline
+       newline
+       body         ## For instance, an HTML page
+------------------------------------------------------------------------------------------------------------------
+
+ # Simple demo using the handy 'curl' utility (https://curl.haxx.se/ -- works on all systems)
+
+     ## Issue a GET request against the web server on condor.depaul.edu
+     % curl --request GET --verbose http://condor.depaul.edu/mkalin/
+
+      * About to connect() to condor.depaul.edu port 80 (#0)
+      *   Trying 216.220.180.148... connected
+
+      > GET /mkalin/index.html HTTP/1.1
+      > User-Agent: curl libcurl OpenSSL zlib libidn librtmp
+      > Host: condor.depaul.edu
+      > Accept: */*
+      > 
+
+      < HTTP/1.1 200 OK
+      < Server: Apache/2.2.3 (Red Hat)
+      < ETag: "1c241-bd2-52c9ec63e9b80"
+      < Accept-Ranges: bytes
+      < Content-Length: 3026
+      < Content-Type: text/html
+      < Connection: close
+      < 
+      <html>
+      <title>Home page</title>
+      <head>
+        ...
+      </head>
+      <body>
+        ...
+      </body>
+      </html>
+
+      * Closing connection #0
+----------------------------------------------------------------------------------------------------------
+
+      Context: 
+               -- Post a form that contains information about a new equipment item, in this case skis.
+
+               -- The 'dataVerifier' servlet checks the submitted form.
+
+               -- If OK, the 'dataVerifier' redirects to the 'goodResult' servlet (a translated JSP script);
+                  otherwise, the 'dataVerifier' redirects to the 'badResult' servlet' (another JSP script).
+
+      % curl --request POST --verbose --data "product=Acme Super Skis&category=Ski equipment&price=1234.56" \
+             -L  http://localhost:8080/skiServ/dataVerifier
+
+      > POST /skiServ/dataVerifier HTTP/1.1
+      > User-Agent: curl libcurl OpenSSL zlib libidn librtmp
+      > Host: localhost:8080
+      > Accept: */*
+      > Content-Length: 61
+      > Content-Type: application/x-www-form-urlencoded
+
+      * upload completely sent off: 61 out of 61 bytes
+
+      < HTTP/1.1 302 Found
+      < Server: Apache-Coyote/1.1
+      < Set-Cookie: JSESSIONID=E9533CE7667BED64A2E4E0D5AD05CC2A; Path=/skiServ/; HttpOnly
+      < Location: http://localhost:8080/skiServ/goodResult.jsp
+      < Content-Length: 0
+      < 
+
+      * Connection #0 to host localhost left intact
+      * Issue another request to this URL: 'http://localhost:8080/skiServ/goodResult.jsp'
+      * Violate RFC 2616/10.3.3 and switch from POST to GET
+      * Re-using existing connection! (#0) with host localhost
+      * Connected to localhost (127.0.0.1) port 8080 (#0)
+
+      > POST /skiServ/goodResult.jsp HTTP/1.1
+      > User-Agent: curl libcurl OpenSSL zlib libidn librtmp
+      > Host: localhost:8080
+      > Accept: */*
+      >
+ 
+      < HTTP/1.1 200 OK
+      < Server: Apache-Coyote/1.1
+      < Set-Cookie: JSESSIONID=DE51C48DD5895E805B0747E2D8AFB2F9; Path=/skiServ/; HttpOnly
+      < Content-Type: text/html;charset=ISO-8859-1
+      < Content-Length: 303

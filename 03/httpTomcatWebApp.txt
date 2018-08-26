@@ -1,0 +1,98 @@
+
+ -- Interactions among HTTP, the web container, and app-specific code
+
+ # Given an incoming HTTP request to Tomcat/Catalina
+
+
+             Catalina in the case of Tomcat
+                          /                 +-----> static content (e.g., 'productList.html')?
+      HTTP request  +---------------+       |
+     -------------->| web container |-------+-----> app-specific servlet (e.g., 'myProdListServlet')?
+                    +---------------+       |
+                                            +-----> framework servlet (e.g., the JSF servlet)? 
+
+    ## For app-specific servlets, recall that JSP scripts are translated into servlet instances (in Tomcat,
+       Jasper is the 'JSP engine' that does the translating).
+
+ # Here's how each of these cases is handled:
+
+   -- Requests for static content
+
+        http://...:8080/acmeProducts/productList.html   ## a static HTML page
+
+      are dispatched to the DefaultServer, which comes with the web container Catalina.
+
+              productList.html  +--------------------+
+      request------------------>| request dispatcher |----->DefaultServlet ## loaded when Tomcat starts up
+                                +--------------------+
+
+             body of the HTTP response
+                     /
+                 productList.html
+      requester<------------------DefaultServlet
+
+ # For dynamic content--the request-handling code in a web app--Catalina 
+
+   -- parses the request
+
+   -- generates a map (key/value pairs) of the request contents
+
+   -- passes the map to the request-handling code
+
+   -- passes a channel reference to the request-handling code so that this
+      code can generate a response    
+
+                                                 HttpServletRequest instance
+                                                            /
+              productList.jsp   +--------------------+  request map
+      request------------------>| request dispatcher |-------------->productListServlet ## compiled JSP script
+                                +--------------------+
+
+
+            body of the HTTP response
+                     /
+                 productList.html
+      requester<------------------productListServlet
+                     \
+               HttpServletResponse instance
+
+ # For various web frameworks (e.g., JSF = JavaServerFaces), the approach is quite similar:
+
+   ## There's an 'interceptor' servlet that represents the framework.
+
+   ## The interceptor then manages the application-specific code.
+
+   Depicition:
+
+                                                 HttpServletRequest instance
+                                                            /
+              productList.jsf   +--------------------+  request map              
+      request------------------>| request dispatcher |-------------->JSF servlet------>app-specific code
+                                +--------------------+                  \
+                                                                 'interceptor' servlet
+
+-------------------------------------------------------------------------------------------------
+
+ # An HTTP(S) request has the start-line/headers/[body] structure examined earlier:
+
+   -- always a start-line and at least one header element
+
+   -- body is optional (e.g., PUT and POST have a body, GET and DELETE do not)
+
+ # The javax.servlet.http.HttpServlet class encapsulates 'do' methods that are Java
+   counterparts of the underlying HTTP methods ('verbs'): doGet, doPost, doPut, doDelete, etc.
+
+   ### In general, the servlet API enables and simplifies program interaction with the
+       underlying HTTP request and HTTP response.
+
+   ## The web container (Catalina in Tomcat) parses the request, and creates a Java map
+      from the key/value pairs that make up the HTTP headers and (optional) body. Info
+      from the HTTP start-line (e.g., the HTTP verb such as GET or POST) also goes into
+      this map. 
+      
+      ### Various 'get' methods are available to extract information from the HTTP
+          start-line, the headers, and the body.
+
+      ### The API is flexible: an HTTP request can have arbitrarily many header and body
+          elements so the API has, for example, a getParameter(paramName) method.
+

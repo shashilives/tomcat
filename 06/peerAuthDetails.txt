@@ -1,0 +1,90 @@
+  -- Peer authentication and digital certificates
+
+     # To enable HTTPS for Tomcat, we need a digital certificate. Why?
+       ## How do DCs and the 'S' in HTTPS link up? 
+       
+     # Three key terms play a role in wire-level security, 'peer authentication' in particular:
+
+       -- Key Pair (a public and a private key per pair)
+       
+       -- Digital Certificate (includes a public key and a digital signature as a voucher)
+          ## Digital signature: message digest encrypted with the private key from a key pair
+       
+       -- Certificate Authority (CA): company that vouches for a digital certificate
+          ## CA vouches for a DC by adding the CA's digital signature to the DC
+
+       ## HTTPS addresses the man-in-the-middle-challenge by having the two sides (Alice, Bob)
+          confirm their identities:
+
+          ### Alice and Bob exchange Digital Certificates (DCs) to confirm their identities.
+              Alice sends one or more DCs to Bob, who does the same to Alice.
+              Each verifies the DCs of the other.
+
+          ### Alice's own DCs are in her 'keystore'; the ones she trusts are in her 'truststore'.
+
+       ## Core Java comes with a 'keytool' utility for creating a key pair.
+
+       -- Here's a scenario for creating a DC signed by a CA:
+    	
+    	1. Alice sends a signed certificate request containing her name, her public key,
+    	   and perhaps some additional information to a CA.
+    	
+    	2. The CA creates a message M from Alice's request, signing the message M
+    	   with its private key, thereby creating a separate signature message SIG.
+    	
+    	3. The CA returns to Alice the message M with the its signature SIG.
+    	   Together M and SIG form Alice's certificate.
+    	
+    	4. Alice sends her newly minted certificate to Bob to give him access to her public key.
+    	
+    	5. Bob verifies the signature SIG using the CA's public key.
+    	   If the signature proves valid, he accepts the public key in the certificate as
+    	   Alice's public key, that is, as her identity.
+
+     # Keystore and truststore
+
+       ## Core Java ships with a default truststore: 
+
+             JAVA_HOME/jre/lib/security/cacerts
+
+       ## But core Java doesn't come with a default keystore (we'll build one later).
+    	
+     # Digital Certificate Layout (X.509 v3)
+
+    	Certificate:
+    	   Data:
+    	       Version: 3 (0x2)
+    	       Serial Number: 1 (0x1)
+    	       Signature Algorithm: md5WithRSAEncryption
+    	       Issuer: C=ZA, ST=Western Cape, L=Cape Town, O=Thawte Consulting cc,
+                   OU=Certification Services Division,
+                   CN=Thawte Server CA/emailAddress=server-certs@thawte.com
+    	       Validity
+    	           Not Before: Aug  1 00:00:00 1996 GMT
+    	           Not After : Dec 31 23:59:59 2028 GMT
+    	       Subject: C=ZA, ST=Western Cape, L=Cape Town, O=Thawte Consulting cc,
+    	                OU=Certification Services Division,
+    	                CN=Thawte Server CA/emailAddress=server-certs@thawte.com
+    	       Subject Public Key Info:
+    	           Public Key Algorithm: rsaEncryption
+    	           RSA Public Key: (1024 bit)
+    	               Modulus (1024 bit):
+    	                   00:d3:a4:50:6e:c8:ff:56:6b:e6:cf:5d:b6:ea:0c:
+   	                   68:75:47:a2:aa:c2:da:84:25:fc:a8:f4:47:51:da:
+   	                   85:b5:20:74:94:86:1e:0f:75:c9:e9:08:61:f5:06:
+                           ...
+   	                   6d:c0:28:42:99:d7:4c:43:de:c3:f5:21:6d:54:9f:
+   	                   5d:c3:58:e1:c0:e4:d9:5b:b0:b8:dc:b4:7b:df:36:
+   	                   3a:c2:b5:66:22:12:d6:87:0d
+   	               Exponent: 65537 (0x10001)
+   	       X509v3 extensions:
+   	           X509v3 Basic Constraints: critical
+   	               CA:TRUE
+   	   Signature Algorithm: md5WithRSAEncryption
+   	       07:fa:4c:69:5c:fb:95:cc:46:ee:85:83:4d:21:30:8e:ca:d9:
+   	       a8:6f:49:1a:e6:da:51:e3:60:70:6c:84:61:11:a1:1a:c8:48:
+               ...
+   	       e7:20:1b:8b:ca:a4:ab:8d:e9:51:d9:e2:4c:2c:59:a9:da:b9:
+   	       b2:75:1b:f6:42:f2:ef:c7:f2:18:f9:89:bc:a3:ff:8a:23:2e:
+   	       70:47
+

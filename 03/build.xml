@@ -1,0 +1,189 @@
+<?xml version = "1.0" encoding = "UTF-8"?>  
+
+<!-- This file (build.xml) is housed in the current working directory, hereafter cwd.
+     There should be a src subdirectory:
+
+     cwd  ## Ant script build.xml is here.
+      |
+     src  ## Everything else is here or below.
+
+     All files except for Java source files should be placed directly in src. Examples include
+     XML files (e.g., web.xml), JSP scripts (e.g., hi.jsp), HTML files (e.g., hi.html),
+     and JAR files (e.g., jstl.jar). Java source files should be packaged, for example:
+
+     package foo.bar;
+     public class Whatever { /*...*/ }
+
+     These source files should be housed in the appropriate subdirectory of src, in this case:
+
+     cwd
+      |
+     src
+      |
+     foo
+      |
+     bar  ## Whatever.java occurs here     
+
+     This build.xml file must be edited but only one line needs to be changed:
+
+        <property name="tomcat.home" value="/home/kalin/tomcat8">
+
+     The value of the tomcat.home property must be set to the install directory for Tomcat, in this 
+     example the directory /home/kalin/tomcat8.
+
+     In running the Ant script, you provide the applicaton's name (the name of its WAR file) with a -D flag. 
+     Here's a sample:
+
+           ant deploy -Dwar.name=app1
+
+     or
+
+           ant -Dwar.name=app1 deploy
+
+     The Ant task adds the .war extension to your file so that app1.war is the deployed file.
+
+     To begin, you can just type 
+     
+          ant
+
+     at the command-line prompt. You'll see that you can clean, build, or deploy (ant -Dwar.name=app1 deploy).
+
+     This Ant script packages, for convenience, the Java source in the deployed WAR.
+     In a production environment, this would not be best practices, of course.
+
+     This build file makes assumptions based on file extensions. In particular:
+
+        # After a .java file is compiled in its package, the corresponding .class
+          file occurs in the same package rooted, in the WAR file, at
+          WEB-INF/classes. So if foo.bar.Whatever.java is the fully qualified class name,
+          then the resulting .class file winds up in WEB-INF/classes/foo/bar, that is,
+          WEB-INF/classes/foo/bar/Whatever.class.
+
+        # Files with a .xml extension (e.g., web.xml) wind up in WEB-INF.
+
+        # Files with a .jar extension wind up in WEB-INF/lib.
+
+        # Files with a .tag extension wind up in WEB-INF/tags
+
+        # Other other files (e.g., JavaScript, HTML, CSS, JSP) wind up in WAR's top level.
+
+     The Ant script creates a separate 'build' directory in which to do its work; your 'src' directory is
+     not changed. The command
+
+        ant clean
+
+     removes the 'build' directory and any .war file from the cwd.
+
+    The build.xml file is easily editable if you'd like to make changes.
+-->
+
+<project name="TomcatProject" basedir="." default="usage">  
+
+  <!-- #### Change for your system. #### -->
+  <property name="tomcat.home" value="/Users/martinkalin/tomcat8"/>
+
+  <!-- Leave the rest as they are. -->
+  <property name="tomcat.lib"  value="${tomcat.home}/lib"/>
+  <property name="deploy.path" value="${tomcat.home}/webapps"/>
+  
+  <property name="src.dir"   value="${basedir}/src"/>  
+  <property name="build.dir" value="${basedir}/build"/>  
+  <property name="dist.dir"  value="${basedir}/dist"/>
+  <property name="war.name"  value="(Please supply a name!)"/>
+  
+  <property name="name" value="TomcatProject"/>  
+  <path id="master-classpath">  
+    <fileset dir="${tomcat.lib}">  
+      <include name="*.jar"/>  
+    </fileset>  
+    <fileset dir="${src.dir}">
+      <include name="*.jar"/>
+    </fileset>
+    <pathelement path="${build.dir}"/>  
+  </path>  
+  
+  <target name="usage">  
+    <echo message=""/>  
+    <echo message="${name} build file"/>  
+    <echo message=""/>  
+    <echo message="ant clean                   --> to remove all but src"/>
+    <echo message="ant compile                 --> to compile only"/>
+    <echo message="ant deploy -Dwar.name=test1 --> to deploy test1.war"/>  
+    <echo message=""/>  
+  </target>  
+  
+  <target name="clean" description="clean up">
+    <delete dir="${build.dir}" />
+    <delete>
+    	<fileset dir="." includes="*.war"/>
+    </delete>
+  </target>
+  
+  <target name="prepare" depends="clean">
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${build.dir}/WEB-INF"/>
+    <mkdir dir="${build.dir}/WEB-INF/classes"/>
+    <mkdir dir="${build.dir}/WEB-INF/lib"/>
+    <mkdir dir="${build.dir}/WEB-INF/data"/>
+    
+    <!-- Copy files from source to build directory  -->
+    <copy todir="${build.dir}">
+      <fileset dir="${src.dir}">
+        <include name="**/*.java"/>
+	<include name="*.jsp"/>
+	<include name="*.html"/>
+	<include name="*.xhtml"/>
+	<include name="*.jsf"/>
+	<include name="*.js"/>
+	<include name="*.css"/>
+      </fileset>
+    </copy>
+    <copy todir="${build.dir}/WEB-INF">
+      <fileset dir="${src.dir}">
+        <include name="*.xml"/>
+      </fileset>
+    </copy>
+    <copy todir="${build.dir}/WEB-INF/data">
+      <fileset dir="${src.dir}">
+        <include name="*.db"/>
+      </fileset>
+    </copy>
+    <copy todir="${build.dir}/WEB-INF/lib">
+      <fileset dir="${src.dir}">
+        <include name="*.jar"/>
+      </fileset>
+    </copy>
+    <copy todir="${build.dir}/WEB-INF/tags">
+      <fileset dir="${src.dir}">
+        <include name="*.tag"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile" depends="prepare" 
+          description="compile main source tree java files">  
+    <javac destdir="${build.dir}/WEB-INF/classes" debug="true"  
+           includeantruntime="false" deprecation="false" optimize="false" failonerror="true">  
+      <src path="${src.dir}"/>  
+      <classpath refid="master-classpath"/>  
+    </javac>  
+  </target>  
+  
+  <target name="deploy" depends="compile" 
+          description="deploy application as a war file">  
+    <delete>
+      <fileset dir="${build.dir}" includes="*.java,*.db,*.jar,web.xml"/>
+    </delete>
+    <war destfile="${war.name}.war"  
+         webxml="${build.dir}/WEB-INF/web.xml">  
+      <fileset dir="${build.dir}">  
+        <include name="**/*.*"/>  
+      </fileset>  
+    </war>  
+    <copy todir="${deploy.path}" preservelastmodified="true">  
+      <fileset dir=".">  
+        <include name="*.war"/>  
+      </fileset>  
+    </copy>  
+  </target>  
+</project> 

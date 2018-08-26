@@ -1,0 +1,53 @@
+
+ -- More on deployment errors with JSP scripts
+
+ # The WAR file 'badJSP.war' embeds a JSP scriptmthat has errors. Below is an edited dump that
+   Tomcat delivers to help us find and fix the error.
+
+   ## The error message occurs in browser with the server on localhost:
+
+;;;;
+runtime error:
+
+org.apache.jasper.JasperException: Unable to compile class for JSP: 
+
+An error occurred at line: 10 in the jsp file: /bad.jsp
+Syntax error, insert ";" to complete Statement
+7:     <%
+8:         out.println("The time is: " + new java.util.Date().toString()); // so far, so good
+9:         for (int i = 0; i < 4; i++) out.println("Hello, world!");       // still ok
+10:         out.println("Bye, bye...")  //### Error: missing semicolon in statement
+11:     %>
+12:   </body>
+13: </html>
+
+Stacktrace:
+	org.apache.jasper.compiler.DefaultErrorHandler.javacError(DefaultErrorHandler.java:102)
+	org.apache.jasper.compiler.ErrorDispatcher.javacError(ErrorDispatcher.java:198)
+	org.apache.jasper.compiler.JDTCompiler.generateClass(JDTCompiler.java:457)
+        ...
+	org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+note The full stack trace of the root cause is available in the Apache Tomcat/8.0.33 logs.
+;;;;
+
+ ## A 2nd example -- another helpful error dump from Tomcat
+
+org.apache.jasper.JasperException: Unable to compile class for JSP: 
+
+An error occurred at line: 8 in the jsp file: /bad.jsp
+java.util.Date.toString cannot be resolved to a type
+5:          The code contains errors, which will prevent deployment.
+6:        -->
+7:     <%
+8:         out.println("The time is: " + new java.util.Date.toString()); // ### should be Date(), not Date
+9:         for (int i = 0; i < 4; i++) out.println("Hello, world!");     // this one's ok
+10:         out.println("Bye, bye...");                                  // this one's fixed
+11:     %>
+
+Stacktrace:
+	org.apache.jasper.compiler.DefaultErrorHandler.javacError(DefaultErrorHandler.java:102)
+        ...
+	org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+
+ # Comparable help from Tomcat occurs in cases in which servlets or utility classes
+   have familiar Java runtime errors (e.g., bad castes, null object references).

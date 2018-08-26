@@ -1,0 +1,77 @@
+
+ -- Web server and web app security: an overview
+
+    # Security covers two distinct but related levels:
+
+      ## Wire-level (transport-level) security: HTTPS
+         ### For Tomcat, this means enabling the HTTPS connector (TOMCAT_HOME/conf/server.xml).
+
+      ## Users/roles security: user authentication and role authorization
+         ### Tomcat supports 'container-managed security' in which Catalina, rather than a particular web app,
+             does the heavy lifting.
+===========================================
+
+ -- Wire-level security issues and services in an Alice-to-Bob message sending scenario
+
+    # Peer authentication (aka mutual challenge):
+    
+                          Is it really Bod on this end?
+                messages   /
+         Alice<---------->Bob  
+          /
+       Is it really Alice on this end?
+
+    # Confidentiality (message encryption/decryption):
+
+               message  +----------------+ encrypted message  +----------------+ message
+         Alice--------->| encrypt engine |------------------->| decrypt engine |--------->Bob
+                        +----------------+        /           +----------------+
+                                      the 'wire' = the communications channel
+
+    # Integrity:
+
+               sent message      received message
+         Alice-------------->...------------------>Bob ## Does sent message == received message?
+                              \
+                           the 'wire'
+
+    # Summary in words:
+
+      ## peer authentication: Alice authenticates her identity to Bob, and Bob does the same to Alice.
+         ### In practice, the authentication is often one-way: the receiver authenticates to the sender.
+     
+      ## confidentiality: Alice encrypts messages sent to Bob, who then decrypts them; same the other way.
+
+      ## integrity: When Bob receives a message, he can confirm that it's the same message that Alice sent.
+=================================================================================================================
+
+ -- Users/roles security 
+ 
+   ## Akin to the security in place when we log into a digital device: the OS maintains a 'password file' (with
+      password hashes), and groups users in order to implement access rights at the group level.
+         
+   For instance, a 'login name'                      Is the user a 'senior DB admin'?
+            \                                                 \
+          identity  +---------------------+ optional  +--------------------+
+     user---------->| user authentication |---------->| role authorization |------->user's access rights
+                    +---------------------+           +--------------------+
+                            \                                  \ 
+                         phase 1                             phase 2
+
+  ## A password or other credential vouches for an identity.
+
+  ## Two phase process in which a user provides a credential that verifies the user's identity:
+  
+     ### The first phase is user authentication: for instance, Alice uses a password, retinal scan,
+	 digital certificate, or the like to confirm her identity as Alice.
+
+         #### AWS approach: (a) Client creates a 160-bit hash value using the client's secret key
+		            (b) This hash value--and not the secret key--travels over the wire
+                            (c) Amazon, with its copy of the secret key, generates another 
+                                160-bit value from the same data--and verifies by comparing the two.
+				
+            -- This is known, in general, as HMAC: keyed-Hash Message Authentication Code
+
+     ### The second (and optional) phase is role authorization: for instance, a database lookup
+	 confirms that Alice is authorized to read/write/delete a particular resource, but the
+         comparable lookup confirms that Bob is authorized only for read operations on the resource.

@@ -1,0 +1,54 @@
+
+ -- Wrapup of security
+
+    # In a web context, users/roles security should be implemented atop wire-level security
+      because sensitive info (e.g., IDs and especially passwords) are traveling over the wire:
+
+              +----------------------+
+              | users/roles security |   ## various approaches are possible
+              +----------------------+
+              |  wire-level security |   ## HTTPS or equivalent (the SSL layer)
+              +----------------------+
+
+    # Configuring Tomcat for wire-level security is straightforward:
+
+      -- Get a DC (self-signed is OK for developent) to place in a keystore.
+
+      -- Uncomment the port 8443 connector in TOMCAT_HOME/conf/server.xml
+         ## Set the keytoreFile and keystorePass attributes in the connector elements.
+
+      -- Restart Tomcat if it's running.
+
+    # For users/roles security, Tomcat allows us to pick the auth/auth implementation ('realm') 
+      to be used for 'container-managed security'.
+
+         -- The default is straightforward: put the auth/auth info in TOMCAT_HOME/conf/tomcat-users.xml.
+	    Default realm is UserDatabaseRealm, and requires no configuration in server.xml.
+
+         -- The built-in realms cover the usual approaches, and customization is always possible.
+
+    # On the web-app side, setting up users/roles security should be confined to the configuration file 'web.xml'
+      and, where appropriate, to back-end datastores such as databases.
+
+    # For capturing a client's ID (e.g., username) and supporting credential (e.g., password), 
+      the preferred approach with the browser as the user-agent is the FORM method:
+
+      ## The web app itself provides a login form, with some naming conventions understood (e.g.,
+         the form's action is 'j_security_check', and the username and password are captured in
+         input components with the names 'j_username' and 'j_password', respectively).
+
+         ### Storing a message digest of the password, rather than the password itself, requires
+             a customized approach, as the 'j_security_check' is the web container's
+             code, and not ours. A JAAS approach might make sense here.
+
+      ## The web app also provides, through the standard config file 'web.xml', information about
+         the security constraints in play within the app:
+
+         -- Which resources within the deployed WAR file are to be secured? All or only some?
+
+         -- Which wire-level constraints are to apply? 'Confidentiality', 'message integrity', both?
+            ## Requiring either one of these is typically sufficient to signal Tomcat that SSL is to be in play.
+
+         -- Which role authorizations, if any, are required to access a particular secured resource?
+
+               

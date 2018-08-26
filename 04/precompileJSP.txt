@@ -1,0 +1,108 @@
+
+ -- Precompiling JSP scripts
+
+ # Tomcat has a nice, short Ant script available for the job:
+
+      https://tomcat.apache.org/tomcat-8.0-doc/jasper-howto.html 
+
+   -- This is the build.xml file.
+
+ # The script assumes the following directory structure, with the 'working directory' as the
+   one that contains 'build.xml' and from which the 'ant' commands are entered at the command-line prompt:
+
+                 working directory      ## contains 'build.xml', 'ant' commands issued from here
+                       |
+                    WEB-INF             ## Jasper creates a 'generated_web.xml' file here
+                       |
+          +------------+------------+
+          |            |            |
+         src          lib        classes
+          /            \            /
+     .jsp files    .jar files   generated .class files
+
+ # Two sample runs with 'bad.jsp' as the example JSP script:
+
+   -- In the first run, the JSP script contains a syntax error.
+
+   -- Before the second run, the error is fixed.
+
+   Here's the JSP script:
+
+     <!doctype>
+     <html>
+       <body>
+         <!-- Below is a 'scriplet': Java code embedded in an HTML template.
+              The code contains errors, which will prevent deployment.
+         -->
+         <%
+             out.println("The time is: " + new java.util.Date().toString()); // so far, so good
+             for (int i = 0; i < 4; i++) out.println("Hello, world!");     // still ok
+             out.println("Bye, bye...")  //### Error: missing semicolon in statement
+         %>
+       </body>
+     </html>
+
+  # 1st run: with error in the JSP script
+
+      % ant -Dtomcat.home=$HOME/tomcat8 -Dwebapp.path=.
+
+	Buildfile: /home/kalin/precompile/build.xml
+	Trying to override old definition of datatype resources
+
+	jspc:
+	   [jasper] org.apache.jasper.servlet.TldScanner scanJars
+	   [jasper] INFO: At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this 
+		    logger for a complete list of JARs that were scanned but no TLDs were found in them. 
+		    Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+
+	compile:
+	   [javac] /home/kalin/tcat/mats/precompile/build.xml:23: warning: 'includeantruntime' was not set, 
+		   defaulting to build.sysclasspath=last; set to false for repeatable builds
+	   [javac] Compiling 1 source file to /home/kalin/precompile/WEB-INF/classes
+	   [javac] /home/kalin/precompile/WEB-INF/src/org/apache/jsp/WEB_002dINF/src/bad_jsp.java:113:
+	            error: ';' expected
+       ### [javac]         out.println("Bye, bye...")  //### Error: missing semicolon in statement
+	   [javac]                                   ^
+	   [javac] 1 error
+	   [javac] Compile failed; see the compiler error output for details.
+
+  # 2nd run: error fixed
+
+      % ant -Dtomcat.home=$HOME/tomcat8 -Dwebapp.path=.
+
+	Buildfile: /home/kalin/precompile/build.xml
+	Trying to override old definition of datatype resources
+
+	jspc:
+	   [jasper] org.apache.jasper.servlet.TldScanner scanJars
+	   [jasper] INFO: At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging
+	            for this logger for a complete list of JARs that were scanned but no TLDs were found in them.
+		    Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+
+	compile:
+	   [javac] /home/kalin/precompile/build.xml:23: warning: 'includeantruntime' was not set, 
+		   defaulting to build.sysclasspath=last; set to false for repeatable builds
+	   [javac] Compiling 1 source file to /home/kalin/precompile/WEB-INF/classes
+
+  # The generated 'web.xml' fragment:
+
+     <!--
+       Automatically created by Apache Tomcat JspC.
+       Place this fragment in the web.xml before all icon, display-name,
+       description, distributable, and context-param elements.
+     -->
+     <servlet>
+        <servlet-name>org.apache.jsp.WEB_002dINF.src.bad_jsp</servlet-name>
+        <servlet-class>org.apache.jsp.WEB_002dINF.src.bad_jsp</servlet-class>
+     </servlet>
+
+     <servlet-mapping>
+        <servlet-name>org.apache.jsp.WEB_002dINF.src.bad_jsp</servlet-name>
+        <url-pattern>/WEB-INF/src/bad.jsp</url-pattern>
+     </servlet-mapping>
+     <!--
+       All session-config, mime-mapping, welcome-file-list, error-page, taglib,
+       resource-ref, security-constraint, login-config, security-role,
+       env-entry, and ejb-ref elements should follow this fragment.
+     -->
+

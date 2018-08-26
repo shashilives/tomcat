@@ -1,0 +1,36 @@
+
+ -- HTTPS exercise: configure Tomcat for HTTPS connections
+
+    # The gist is to repeat the process that we've gone through: doing it from start to finish is worth the effort.
+
+    # The details:
+
+      -- Use the keytool or equivalent to create a DC. If you've time, you might experiment with a different tool.
+
+         ## To start, the 'keytool' is the easiest way to go, but openssl and the Windows Key Manager
+	    could be used as well -- with a bit more work. 
+
+      -- Configure Tomcat (TOMCAT_HOME/conf/server.xml) so that it can support HTTPS connections.
+
+         ## In the example we covered, I put the keystore ('devel.keystore') with my self-signed DC in my home directory,
+            but a better location would be under TOMCAT_HOME, e.g., TOMCAT_HOME/conf/certs.
+
+         ## The location of the keystore is arbitrary, as the configuration entry in server.xml can specify any location
+            on the local file system.
+
+      -- After configuring and then starting or restarting Tomcat, test that Tomcat indeed accepts HTTPS
+         connections. 
+
+         ## Open a browser to https://localhost:8443
+
+         ## Use 'curl' instead: curl https://localhost:8443
+
+            ### To avoid the 'bad certificate' warnings from 'curl', use the --insecure flag.
+
+         Either of these should work, assuming that we've left "clientAuth=false" in the Tomcat configuration.
+
+
+
+
+
+     

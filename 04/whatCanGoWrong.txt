@@ -1,0 +1,50 @@
+
+ -- What Can Go Wrong in Deployemnt?
+
+ # Tomcat obviously can't help us programmers with errors in the app logic:
+
+   -- Example: Client requests our company's product list, but we reply with the private
+               vendor list instead.
+
+ # The errors in question center on the interaction between (a) the web app and (b) the web container, Catalina.
+
+ # The error types, in broad categories to begin:
+
+   -- Problems with XML config files (e.g., the standard deployment descriptor 'web.xml'):
+
+      ## The XML is syntactically ill-formed (i.e., can't pass a 'non-validating parse').
+      ## The XML doesn't match a required schema (i.e., can't pass a 'validating parse').
+
+   -- JSP problems: 
+
+      ## JSP scripts, if deployed as such, are translated into servlets. This happens, by default,
+         on the 1st client hit (though we can change this easily to deployment time): problem is 
+         seen earlier, but obviously doesn't go away.
+
+                   1st request for JSP script 
+        1st client---------------------------->Jasper translates script into a servlet ## 'lazy' translation
+                                 
+                            JSP script
+        web app deployed---------------------->Jasper translates script into a servlet ## 'aggressive' translation
+
+         ### If there's a compile-time error, it shows up _after_ we've deployed.
+
+         ### Incentive enough to pre-compile JSP scripts.
+
+         ### 'Unreachable statement' errors can be tricky in JSP -- more on this later.
+
+   -- General Java code run-time problems: infinite loops, NullPointerExceptions, bad type casts, etc.
+
+         ### Compiling as part of deployment catches the standard syntax and other compile-time errors (e.g.,
+             missing semicolons).
+
+ # Tomcat, given a 'localhost' URL, provides some nice debugging help, especially in detecting 
+   compile-time errors that arise in the JSP-script-to-servlet-instance translation.
+
+ # It's easy for web apps to write to the standard Tomcat log files, which then can be used to aid
+   in debugging.
+
+
+
+ 
+ 

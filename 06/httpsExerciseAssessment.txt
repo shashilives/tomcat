@@ -1,0 +1,49 @@
+
+ -- Assessing the Tomcat-HTTPS exercise
+
+ # Generating the self-signed certificate
+
+   -- Tomcat accepts DCs in various formats:
+
+      ## JKS:             Java KeyStore (what the 'keytool' utility uses)
+
+      ## PKCS and PKCS12: Public Key Cryptograpy Standards
+
+         ### PKCS12 is an Internet standard.
+
+         ### OpenSSL (https://www.openssl.org/) and Microsoft's Key Manager 
+             (https://www.microsoft.com/en-us/download/details.aspx?id=12419) work with PKICS12.
+
+      ## The 'keytool' can import PKCS12 DCs into a JKS keystore.
+
+ # Configuring Tomcat, with the relevant entry from TOMCAT_HOME/conf/server.xml shown below
+
+   ## Big picture -- the 'SSL' for the 'S' in HTTPS is available two ways in Tomcat:
+
+      -- Through JSSE (Java Secure Sockets Extension) introduced in JDK 1.4
+ 
+      -- Through APR (Apache Portable Runtime), a 'native' (that is, implemented-in-C) library for Tomcat,
+         which uses OpenSSL by default.
+
+      -- In the the 'Connector' entry for port 8443, the 2nd attribute ('protocol') determines what's used:
+
+            Setting for 'protocol'                              Comment
+          
+                "HTTP/1.1"                            Let Tomcat pick: not recommended
+     "org.apache.coyote.http11.Http11Protocol"        JSSE BIO (Blocking I/O) impelementation
+     "org.apache.coyote.http11.Http11NioProtocol"     JSSE NIO (New I/O) implementation
+     "org.apache.coyote.http11.Http11Nio2Protocol"    JSSE NIO2 implementation
+     "org.apache.coyote.http11.Http11AprProtocol"     APR with OpenSSL implementation ('keep-alive' automatic)
+ 
+     <Connector 
+         port="8443"                                             ## if changed, change 'redirectPort' for HTTP connector
+         protocol="org.apache.coyote.http11.Http11NioProtocol"   ## covered above 
+         maxThreads="150"                                        ## might set higher with APR
+	 
+         SSLEnabled="true"                                       ## definitely -- turns SSL on
+         scheme="https"                                          ## standard scheme for HTTPS
+         secure="true"                                           ## definitely -- passes this info to servlets
+         clientAuth="false"                                      ## better for web sites: client may not have DC on machine
+         sslProtocol="TLS"                                       ## the default: current version is 1.0
+         keystoreFile="${user.home}/devel.keystore"              ## can be anywhere on local file system
+         keystorePass="qubits" />                                ## set during keytool or equivalent session

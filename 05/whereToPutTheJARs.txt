@@ -1,0 +1,54 @@
+
+ -- Where should the JAR files go?
+
+ # Web apps of all stripes need software libraries, packaged as JAR files.
+
+   ## JAR files in this context are not executable Java applications, but rather software libraries
+      used in various web apps.
+
+ # The options:
+
+   -- TOMCAT_HOME/lib:  JARs in this directory are loaded at startup and available to all web apps
+                        running in the web container.
+
+      ## The current list for Tomcat8, 24 in all:
+
+          annotations-api.jar             ## for persistence, security, etc.
+          catalina-ant.jar                ## Ant support
+          catalina-ha.jar                 ## cluster management ("ha" = "high availability")
+          catalina.jar                    ## web (servlet) container
+          catalina-storeconfig.jar        ## XML configuration storage
+          catalina-tribes.jar             ## channels and related transport libraries: "group communication"
+          ecj-4.5.jar                     ## Eclipse JDT (Java Development Tools) compiler
+          el-api.jar                      ## Expression language (JSP 3.x)
+          jasper-el.jar                   ## Jasper EL support
+          jasper.jar                      ## JSP translator/runtime
+          jsp-api.jar                     ## JSP API
+          servlet-api.jar                 ## Servlet 3.1 API
+          tomcat-api.jar                  ## Interfaces shared with Catalina and Coyote
+          tomcat-coyote.jar               ## Connectors (e.g., for HTTP 1.1) and utilities
+          tomcat-dbcp.jar                 ## Apache Commons Connection Pooling for RDBMSes
+          tomcat-i18n-es.jar              ## i18n for Spanish
+          tomcat-i18n-fr.jar              ## i18n for French
+          tomcat-i18n-ja.jar              ## i18n for Japanese
+          tomcat-jdbc.jar                 ## Tomcat's native connection pooling
+          tomcat-jni.jar                  ## Interface to native components such as APR (Apache Portable Runtime)
+          tomcat-util.jar                 ## Miscellaneous utilities
+          tomcat-util-scan.jar            ## ditto
+          tomcat-websocket.jar            ## web socket implementation (1.1)
+          websocket-api.jar               ## web socket API (1.1)
+ 
+      ## From the Apache-Tomcat page, four others are available as good candidates for TOMCAT_HOME/lib:
+
+          catalina-jmx-remote.jar         ## Support JMX (Java Management Extension) remote admin from behind firewall
+          catalina-ws.jar                 ## With jaxrpc.jar and wsdl4j.jar, support SOAP-based web services
+          tomcat-juli-adapters.jar        ## Tomcat's impl. of the java.util.logging API to support per-app logging
+          tomcat-juli.jar                 ## More of the same
+
+   -- In the WAR file's WEB-INF/lib subdirectory
+
+      ## Downside: Adds size to the WAR file (but, as the saying goes, 'memory is cheap').
+
+      ## Upside: 'Freezes' deployable WAR by taking versioning and other issues out of play. (Avoids 'DLL hell'.)
+
+

@@ -1,0 +1,61 @@
+
+ -- Navigation within a deployed WAR file: a trouble-shooting issue
+
+ # So far we've focused on getting the pieces of a web app in the right places within a WAR file.
+
+   ## How can these code pieces interact within the WAR? Another troubleshooting issue...
+ 
+ # A simple deployment example to illustrate navigation: hi3.war
+
+   ## Output of 'jar tvf hi3.war':
+                                 
+       hiTop.html
+       web-assets/hiNested.html
+       WEB-INF/classes/p1/HiServlet.class
+       WEB-INF/web.xml
+
+   ## Depiction of the file structure:
+ 
+                      -- hiTop.html                        ## in top-level directory
+                            |
+            +---------------+--------------+
+            |                              |
+       web-assets                       WEB-INF
+             -- hiNested.html              | -- web.xml    ## in WEB-INF subdirectory
+                                           |
+                                        classes
+                                           |
+                                           p1
+                                              -- HiServlet.class  ## in WEB-INF/classes/p1 subdirectory
+--------------------------------------------------------------------------------------------------------------------
+
+ -- Miscellaneous deployment issues
+
+ # A word about jargon with the deployed WAR file 'hi3.war' as the example:
+
+   ## In the URL 'http://...:8080/hi3', the 'hi3' (WAR file name) is called the 'context' in Tomcat-speak. 
+
+      ### In short, a 'context' is a deployed web app: for packed deployement, the WAR file's name (without the .war)
+
+      ### The 'context' includes all of the WAR file's contents.
+
+      ### The 'context root' is the root of the deployed WAR file, in this case '/hi3/.
+
+   ## Consider the URL 'http://...:8080/'. 
+
+      ## There's only the slash / after the port number. This is the 'root context', in effect the 
+         default context -- it yields Tomcat's own homepage because of how Tomcat is set up.
+
+         ### Tomcat is configured so that TOMCAT_HOME/webapps/ROOT contains all of the goodies
+	     in the 'root context' -- the full Tomcat web console
+
+      ## In a URL such as 'http://...:8080/hi3/hiTop.html', there's a more specific context: 
+
+         -- hi3, the WAR file's name
+
+         -- hiTop.html, an HTML document at the WAR file's top level
+
+ 
+
+
+

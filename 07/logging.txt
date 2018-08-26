@@ -1,0 +1,96 @@
+
+ -- Tomcat logging
+
+  # TOMCAT_HOME/logs is the relevant directory, with various log files:
+    ## On Unix-like systems, 'catalina.out' is the main log file.
+
+    ## On Windows, it's 'catalina.<date>.out' only (e.g., 'catalina.2016-06-18.log').
+
+  # Out of the box, Tomcat uses Apache Commons Logging (http://commons.apache.org/proper/commons-logging), under
+    the Tomcat-specific name JULI.
+    ## JULI is Tomcat's implementation of the standard java.util.logging API (so the 'I' is for 'Implementation').
+
+    ## JULI can be configured through property files or programmatically. For Tomcat, this is done in start-up scripts.
+
+    ## Tomcat logging doesn't interfere with customized web-app logging.
+       ### Web apps can piggy-back on Tomcat logging by writing to System.out and System.err. These
+           writes then are recorded 'catalina.out' (or equivalent).
+
+  # JULI limitations: a java.util.logging implementation is per-JVM, not per web-app. 
+    ## If an installation needs per-web-app logging, then a 'plan B' is required -- and that's log4j
+
+    ## What's needed to switch:
+
+       -- log4j at http://logging.apache.org/log4j (.jar and .properties files)
+
+       -- tomcat-juli.jar and tomcat-juli-adapters.jar from the 'extras' section of the Tomcat
+          download page at https://tomcat.apache.org/download-80.cgi
+
+       -- installation: for the setup, see https://tomcat.apache.org/tomcat-8.0-doc/logging.html
+
+  # The log4j option is more powerful and flexible. Is it needed on your installation?
+--------------------------------------------------------------------------------------------------------------
+
+ # Samples:
+
+   -- from 'catalina.out':
+   
+...
+07-Jun-2016 11:48:24.608 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory
+   Deployment of web application directory /Users/martinkalin/tomcat8/webapps/docs has finished in 8 ms
+07-Jun-2016 11:48:24.608 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory
+   Deploying web application directory /Users/martinkalin/tomcat8/webapps/examples
+07-Jun-2016 11:48:24.721 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory
+   Deployment of web application directory /Users/martinkalin/tomcat8/webapps/examples has finished in 113 ms
+07-Jun-2016 11:48:24.721 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory
+   Deploying web application directory /Users/martinkalin/tomcat8/webapps/host-manager
+07-Jun-2016 11:48:24.732 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory
+   Deployment of web application directory /Users/martinkalin/tomcat8/webapps/host-manager has finished in 11 ms
+...
+07-Jun-2016 11:48:24.752 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory
+   Deployment of web application directory /Users/martinkalin/tomcat8/webapps/ROOT has finished in 7 ms
+07-Jun-2016 11:48:24.754 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+07-Jun-2016 11:48:24.759 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8443"]
+07-Jun-2016 11:48:24.759 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["ajp-nio-8009"]
+07-Jun-2016 11:48:24.760 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in 1565 ms
+...
+
+   -- from localhost_access_log.2016-06-01.txt
+
+...
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:01:24 -0500] "GET /chitchat/ HTTP/1.1" 200 858
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:01:24 -0500] "GET /chitchat/styles.css HTTP/1.1" 200 643
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:01:24 -0500] "GET /chitchat/chat.js HTTP/1.1" 200 1070
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:01:24 -0500] "GET /chitchat/chat HTTP/1.1" 101 -
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:01:24 -0500] "GET /favicon.ico HTTP/1.1" 200 21630
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:01:46 -0500] "GET /chitchat/ HTTP/1.1" 304 -
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:01:46 -0500] "GET /chitchat/styles.css HTTP/1.1" 304 -
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:01:46 -0500] "GET /chitchat/chat.js HTTP/1.1" 304 -
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:01:46 -0500] "GET /chitchat/chat HTTP/1.1" 101 -
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:01:46 -0500] "GET /favicon.ico HTTP/1.1" 200 21630
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:04:46 -0500] "GET /chitchat/ HTTP/1.1" 304 -
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:04:46 -0500] "GET /chitchat/styles.css HTTP/1.1" 304 -
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:04:46 -0500] "GET /chitchat/chat.js HTTP/1.1" 304 -
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:04:46 -0500] "GET /chitchat/chat HTTP/1.1" 101 -
+0:0:0:0:0:0:0:1 - - [01/Jun/2016:20:04:46 -0500] "GET /favicon.ico HTTP/1.1" 200 21630
+...
+
+ # Analysis
+
+   -- AWStats at http://www.awstats.org
+
+   -- JavaMelody at https://github.com/javamelody/javamelody/wiki
+
+   -- Octopussy at http://www.octopussy.pm/
+
+   -- Psi-Problem at https://github.com/psi-probe/psi-probe
+
+ # Log file backup
+
+    -- logrotate at https://support.rackspace.com/how-to/understanding-logrotate-utility
+
+       ## Can be used on Windows if cygwin (https://www.cygwin.com/) is installed.
+
+       ## LogRotateWin at https://sourceforge.net/projects/logrotatewin is a port that doesn't require cygwin.
+ 
+ 

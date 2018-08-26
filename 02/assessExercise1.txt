@@ -1,0 +1,44 @@
+ 
+ Assessment of the 'install Tomcat' exercise
+
+ # Summary points:
+
+   -- Unless there's an issue of disk space, it's more flexible to install the full JDK rather
+      than just the JVM, as the JDK includes the JVM (JAVA_HOME/jre).
+
+      ## In a production environment, it might be policy to have the JVM only, of course.
+
+   -- In general, downloading core Tomcat as an archive, rather than as an installer,
+      gives you more flexibility: complete control over where you put it, no hidden effects.
+
+      ## If you want to have Tomcat run as a service, that's still possible, of course -- but
+         the Windows installer makes this easier.
+
+   -- The verification of "what's up on the Apache server got to my local machine" is straightforward:
+
+      ## Compute the message digest of the downloaded file locally, and compare against the copy
+         on the Apache download server.
+
+      ## Doing both MD5 and SHA1 is about as easy as doing just one:
+
+         -- Windows has the 'certUtil', Mac has the 'md5' and 'sha1' utils, and Linux has
+            the 'md5sum' and 'sha1sum' utils.
+
+   -- The verification of digital signatures is tricky, as you need:
+
+      ## The signed resource: in this case, the downloaded archive or installer. This is easy.
+
+      ## The digital signature: available as the 'pgp' tab on the Apache download site. No problem.
+
+      ## A reliable copy of the signer's public key. Now things get tricky:
+
+         -- A list of the signers is available as the 'KEYS' tab on the Apached load site.
+
+         -- Public keys are available from sites such as MIT, used an the earlier lesson.
+
+         -- The public keys themselves need verification...
+
+
+
+ 
+

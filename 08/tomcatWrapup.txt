@@ -1,0 +1,28 @@
+
+ -- Wrapup for Learning Tomcat 
+
+  # We've covered lots of ground, from installation through advanced features.
+
+  # A wrapup is a time to look again at the big picture:
+
+   -- Tomcat's a production-grade web server: web-app hosting, security, management,...
+
+   -- But it's still lightweight: out of the box, basically ready to use for everything except HTTPS.
+
+      ## Handles wet sites, web services, and combinations of these with web sockets
+
+      ## Easy to extend: add JARs to TOMCAT_HOME/lib or (better) a WAR file's WEB-INF/lib.
+
+   -- Modular design: they can fix the offending piece without redoing the whole thing!
+
+      ## Version updates tend to fix isolated features, and so are relatively minor.
+
+      ## Backward compatibility is a tradition.
+
+   -- Intuitive to use: use the defaults, customize in the deployed WAR file.
+
+  # Run it as a system service: it starts on boot, it stops on reboot.
+
+    ## It should run just fine in the meantime.
+
+

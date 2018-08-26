@@ -1,0 +1,87 @@
+ 
+ -- Downloading and installing Tomcat (http://tomcat.apache.org/): verification 1
+
+ # The very short story: Tomcat's downloadable as an archive (various options) that
+   can be unpacked anywhere you like on the local system.
+
+   ## System rules apply: if you unpack Tomcat somewhere, you need--as a user--the 
+      appropriate system-level permissions to do so.
+
+   ## For a learning versus production environment, I like to install Tomcat in my
+      home directory:
+
+                    MY_HOME_DIRECTORY
+                          |
+                        Tomcat
+
+ ------------------------------------------------------------------------------------------
+
+ # Tomcat versions -- alpha/beta/stable (http://tomcat.apache.org/whichversion.html)
+   ## There's a link from the download page.
+
+   ## Later versions _should_ accommodate apps written for earlier versions.
+ 
+ # Comes in various archive formats (including ZIP), and an installer for Windows.
+   
+   ## Tomcat's written in Java -- so the critical requirement is to have Java (JDK or just JRE)
+      installed, and either JAVA_HOME (you have the JDK) or JRE_HOME (you have only the JRE) defined.
+      
+------------------------------------------------------------------------------------------------------
+
+ -- Verifications: Does the downloaded archive match the copy on the download machine?
+
+                                  download             
+       Tomcat-on-download-machine --------> Tomcat-copied-to-my-local-machine
+                                \           /
+                            Are these two the same?
+
+ # Tomcat provides two 'message digests' (aka 'hashes') to enable the sort of checking
+   illustrated above.
+
+   ## Here's how a message digest works:
+
+  
+     For example, bytes in downloaded Tomcat archive                 For instance, 16 bytes
+                    \                           +----------------+               \
+          arbitrary number of bytes------------>| message digest |-------->fixed-size digest
+                                                +----------------+
+
+   ## Tomcat provides two digests:
+
+      MD5 (Message Digest Version 5):         16-byte digest
+      SHA1 (Secure Hash Algorithm Version 1): 20-byte digest
+
+ # Unix-like systems have utilities such as 'md5sum' and 'sha1sum', and Windows
+   has 'certUtil' built-in. On a Mac, the commands would be 'md5' and 'sha1'.
+
+   Example: (with % as the command-line prompt on my Unix-like system):
+
+     % md5sum apache-tomcat-8.0.33.zip
+       b7ebc21cca3315bab7948513f8e50f79  apache-tomcat-8.0.33.zip         ## output (16 bytes)
+
+     % sha1sum apache-tomcat-8.0.33.zip
+       c99b581878e8cfc7337ebdd84dbde615b9a07eb0  apache-tomcat-8.0.33.zip ## output (20 bytes)
+
+     What I downloaded from the Tomcat mirror:
+
+       b7ebc21cca3315bab7948513f8e50f79 *apache-tomcat-8.0.33.zip         ## MD5
+       c99b581878e8cfc7337ebdd84dbde615b9a07eb0 *apache-tomcat-8.0.33.zip ## SHA1
+
+   ## Versions of the 'md5sum' and 'sha1sum' utilities are available on Windows, but the
+      native 'certUtil' can be used here as well:
+
+     % certUtil -hashfile apache-tomcat-8.0.33-windows-x64.zip MD5
+       MD5 hash of file apache-tomcat-8.0.33-windows-x64.zip:
+       7f 1c 6a 4d 66 6b 9c 76 ef 3b 72 03 8c 5a 89 1e        ## Matches what's on the download server
+       CertUtil: -hashfile command completed successfully.
+
+
+
+
+           
+
+
+
+
+ 
+

@@ -1,0 +1,49 @@
+
+ -- Navigation basics for deployed web apps
+
+ # In 'packed' and 'unpacked' deployment, the web app has the familiar hierarchical file-system structure:
+
+                  top-level
+                     |
+           +...+-----+-----+...+   ## next level
+           |   |     |     |   |
+          ... ...   ...   ... ...  ## and so on
+
+    ## Navigation in the web app thus follows the patterns familiar from navigating the local file system.
+
+ # HTML documents and deployed JSP/JSF/etc. scripts are treated alike with respect to navigation.
+
+ # The potentially tricky part would be servlets and POJOs, as these are instances of classes whose
+   packages can have arbitrarily long names:
+
+          com.org.MyServlet                       ## com.org is the package
+          acme.personnel.management.MedicalPlan   ## acme.personnel.management is the package
+          ...
+
+   ## Recall that the package names are included in the hierarchy rooted at WEB-INF/classes:
+
+                  WEB-INF
+                     |
+                  classes
+                     |
+                    acme
+                     |
+                 personnel
+                     |
+                 management
+
+   ## There's a key difference between servlets and POJOs, however:
+
+      ### Servlets are typically HTTP endpoints: http://...:8080/myApp/myServlet  ## myServlet as an HTTP endpoint
+
+      ### POJOs are instances of utility classes, doing the grunt work for servlets--but are not themselves HTTP endpoints.
+
+   ## Tomcat has a nice workaround to take the complexity out of navigation that involves servlets:
+
+      -- Give the servlet an alias in the 'web.xml' deployment descriptor.
+
+         ## Deployed JSP scripts are treated, with respect to navigation, just like HTML documents.
+
+      -- Use the alias to identify the servlet during navigation.
+
+
